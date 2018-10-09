@@ -134,7 +134,7 @@ private[sql] trait ColumnarBatchScan extends CodegenSupport {
        |if ($batch == null) {
        |  $nextBatchFuncName();
        |}
-       |while ($batch != null) {
+       |while ($limitNotReachedCond $batch != null) {
        |  int $numRows = $batch.numRows();
        |  int $localEnd = $numRows - $idx;
        |  for (int $localIdx = 0; $localIdx < $localEnd; $localIdx++) {
@@ -158,7 +158,7 @@ private[sql] trait ColumnarBatchScan extends CodegenSupport {
     ctx.INPUT_ROW = row
     ctx.currentVars = null
     s"""
-       |while ($input.hasNext()) {
+       |while ($limitNotReachedCond $input.hasNext()) {
        |  InternalRow $row = (InternalRow) $input.next();
        |  $numOutputRows.add(1);
        |  ${consume(ctx, null, row).trim}

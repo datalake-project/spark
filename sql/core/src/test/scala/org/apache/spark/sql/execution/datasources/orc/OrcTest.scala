@@ -104,4 +104,14 @@ abstract class OrcTest extends QueryTest with FileBasedDataSourceTest with Befor
       assert(actual < numRows)
     }
   }
+
+  protected def checkPredicatePushDown(df: DataFrame, numRows: Int, predicate: String): Unit = {
+    withTempPath { file =>
+      // It needs to repartition data so that we can have several ORC files
+      // in order to skip stripes in ORC.
+      df.repartition(numRows).write.orc(file.getCanonicalPath)
+      val actual = stripSparkFilter(spark.read.orc(file.getCanonicalPath).where(predicate)).count()
+      assert(actual < numRows)
+    }
+  }
 }

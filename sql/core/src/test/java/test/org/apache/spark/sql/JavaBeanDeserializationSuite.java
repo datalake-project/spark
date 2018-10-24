@@ -152,7 +152,7 @@ public class JavaBeanDeserializationSuite implements Serializable {
     public boolean equals(Object obj) {
       if (!(obj instanceof ArrayRecord)) return false;
       ArrayRecord other = (ArrayRecord) obj;
-      return (other.id == this.id) && Objects.equals(other.intervals, this.intervals);
+      return (other.id == this.id) && other.intervals.equals(this.intervals);
     }
 
     @Override

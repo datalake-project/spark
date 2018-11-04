@@ -15,18 +15,17 @@
  * limitations under the License.
  */
 
-package org.apache.spark.sql.execution.datasources.csv
+package org.apache.spark.sql.catalyst.csv
 
 import java.io.Writer
 
 import com.univocity.parsers.csv.CsvWriter
 
 import org.apache.spark.sql.catalyst.InternalRow
-import org.apache.spark.sql.catalyst.csv.CSVOptions
 import org.apache.spark.sql.catalyst.util.DateTimeUtils
 import org.apache.spark.sql.types._
 
-private[csv] class UnivocityGenerator(
+class UnivocityGenerator(
     schema: StructType,
     writer: Writer,
     options: CSVOptions) {
@@ -81,6 +80,10 @@ private[csv] class UnivocityGenerator(
    */
   def write(row: InternalRow): Unit = {
     gen.writeRow(convertRow(row): _*)
+  }
+
+  def writeToString(row: InternalRow): String = {
+    gen.writeRowToString(convertRow(row): _*)
   }
 
   def close(): Unit = gen.close()

@@ -1320,6 +1320,10 @@ setGeneric("to_date", function(x, format) { standardGeneric("to_date") })
 #' @name NULL
 setGeneric("to_json", function(x, ...) { standardGeneric("to_json") })
 
+#' @rdname column_collection_functions
+#' @name NULL
+setGeneric("to_csv", function(x, ...) { standardGeneric("to_csv") })
+
 #' @rdname column_datetime_functions
 #' @name NULL
 setGeneric("to_timestamp", function(x, format) { standardGeneric("to_timestamp") })

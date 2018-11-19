@@ -25,7 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.univocity.parsers.csv.CsvParser
 
 import org.apache.spark.Partition
-import org.apache.spark.annotation.InterfaceStability
+import org.apache.spark.annotation.Stable
 import org.apache.spark.api.java.JavaRDD
 import org.apache.spark.internal.Logging
 import org.apache.spark.rdd.RDD
@@ -47,7 +47,7 @@ import org.apache.spark.unsafe.types.UTF8String
  *
  * @since 1.4.0
  */
-@InterfaceStability.Stable
+@Stable
 class DataFrameReader private[sql](sparkSession: SparkSession) extends Logging {
 
   /**

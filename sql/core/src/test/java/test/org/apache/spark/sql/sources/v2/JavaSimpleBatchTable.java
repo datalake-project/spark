@@ -89,12 +89,3 @@ class JavaSimpleReaderFactory implements PartitionReaderFactory {
   }
 }
 
-class JavaRangeInputPartition implements InputPartition {
-  int start;
-  int end;
-
-  JavaRangeInputPartition(int start, int end) {
-    this.start = start;
-    this.end = end;
-  }
-}

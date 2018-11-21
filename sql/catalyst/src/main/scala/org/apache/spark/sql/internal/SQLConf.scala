@@ -1560,6 +1560,13 @@ object SQLConf {
         "turning the flag on provides a way for these sources to see these partitionBy columns.")
       .booleanConf
       .createWithDefault(false)
+
+  val MAX_TO_STRING_FIELDS = buildConf("spark.sql.debug.maxToStringFields")
+    .doc("Maximum number of fields of sequence-like entries can be converted to strings " +
+      "in debug output. Any elements beyond the limit will be dropped and replaced by a" +
+      """ "... N more fields" placeholder.""")
+    .intConf
+    .createWithDefault(25)
 }
 
 /**
@@ -1969,6 +1976,8 @@ class SQLConf extends Serializable with Logging {
     getConf(SQLConf.LEGACY_REPLACE_DATABRICKS_SPARK_AVRO_ENABLED)
 
   def setOpsPrecedenceEnforced: Boolean = getConf(SQLConf.LEGACY_SETOPS_PRECEDENCE_ENABLED)
+
+  def maxToStringFields: Int = getConf(SQLConf.MAX_TO_STRING_FIELDS)
 
   /** ********************** SQLConf functionality methods ************ */
 

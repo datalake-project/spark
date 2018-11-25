@@ -2743,7 +2743,11 @@ setMethod("union",
             dataFrame(unioned)
           })
 
-#' unionAll is deprecated - use union instead
+
+#' Return a new SparkDataFrame containing the union of rows
+#'
+#' This is an alias for `union`.
+#'
 #' @rdname union
 #' @name unionAll
 #' @aliases unionAll,SparkDataFrame,SparkDataFrame-method
@@ -2751,7 +2755,6 @@ setMethod("union",
 setMethod("unionAll",
           signature(x = "SparkDataFrame", y = "SparkDataFrame"),
           function(x, y) {
-            .Deprecated("union")
             union(x, y)
           })
 

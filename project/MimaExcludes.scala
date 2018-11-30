@@ -82,7 +82,49 @@ object MimaExcludes {
     ProblemFilters.exclude[IncompatibleMethTypeProblem]("org.apache.spark.api.java.JavaPairRDD.flatMapValues"),
     ProblemFilters.exclude[IncompatibleMethTypeProblem]("org.apache.spark.streaming.api.java.JavaPairDStream.flatMapValues"),
     ProblemFilters.exclude[IncompatibleResultTypeProblem]("org.apache.spark.sql.util.ExecutionListenerManager.clone"),
-    ProblemFilters.exclude[DirectMissingMethodProblem]("org.apache.spark.sql.util.ExecutionListenerManager.this")
+    ProblemFilters.exclude[DirectMissingMethodProblem]("org.apache.spark.sql.util.ExecutionListenerManager.this"),
+
+    // [SPARK-25862][SQL] Remove rangeBetween APIs introduced in SPARK-21608
+    ProblemFilters.exclude[DirectMissingMethodProblem]("org.apache.spark.sql.functions.unboundedFollowing"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("org.apache.spark.sql.functions.unboundedPreceding"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("org.apache.spark.sql.functions.currentRow"),
+    ProblemFilters.exclude[IncompatibleMethTypeProblem]("org.apache.spark.sql.expressions.Window.rangeBetween"),
+    ProblemFilters.exclude[IncompatibleMethTypeProblem]("org.apache.spark.sql.expressions.WindowSpec.rangeBetween"),
+
+    // [SPARK-23781][CORE] Merge token renewer functionality into HadoopDelegationTokenManager
+    ProblemFilters.exclude[DirectMissingMethodProblem]("org.apache.spark.deploy.SparkHadoopUtil.nextCredentialRenewalTime"),
+
+    // [SPARK-26133][ML] Remove deprecated OneHotEncoder and rename OneHotEncoderEstimator to OneHotEncoder
+    ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.ml.feature.OneHotEncoderEstimator"),
+    ProblemFilters.exclude[MissingTypesProblem]("org.apache.spark.ml.feature.OneHotEncoder"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("org.apache.spark.ml.feature.OneHotEncoder.transform"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("org.apache.spark.ml.feature.OneHotEncoder.getInputCol"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("org.apache.spark.ml.feature.OneHotEncoder.getOutputCol"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("org.apache.spark.ml.feature.OneHotEncoder.inputCol"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("org.apache.spark.ml.feature.OneHotEncoder.setInputCol"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("org.apache.spark.ml.feature.OneHotEncoder.setOutputCol"),
+    ProblemFilters.exclude[DirectMissingMethodProblem]("org.apache.spark.ml.feature.OneHotEncoder.outputCol"),
+    ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.ml.feature.OneHotEncoderEstimator$"),
+
+    // [SPARK-26141] Enable custom metrics implementation in shuffle write
+    // Following are Java private classes
+    ProblemFilters.exclude[DirectMissingMethodProblem]("org.apache.spark.shuffle.sort.UnsafeShuffleWriter.this"),
+    ProblemFilters.exclude[IncompatibleMethTypeProblem]("org.apache.spark.storage.TimeTrackingOutputStream.this"),
+
+    // Data Source V2 API changes
+    (problem: Problem) => problem match {
+      case MissingClassProblem(cls) =>
+        !cls.fullName.startsWith("org.apache.spark.sql.sources.v2")
+      case MissingTypesProblem(newCls, _) =>
+        !newCls.fullName.startsWith("org.apache.spark.sql.sources.v2")
+      case InheritedNewAbstractMethodProblem(cls, _) =>
+        !cls.fullName.startsWith("org.apache.spark.sql.sources.v2")
+      case DirectMissingMethodProblem(meth) =>
+        !meth.owner.fullName.startsWith("org.apache.spark.sql.sources.v2")
+      case ReversedMissingMethodProblem(meth) =>
+        !meth.owner.fullName.startsWith("org.apache.spark.sql.sources.v2")
+      case _ => true
+    }
   )
 
   // Exclude rules for 2.4.x

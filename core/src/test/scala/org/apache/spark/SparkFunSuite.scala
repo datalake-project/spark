@@ -26,7 +26,7 @@ import org.apache.log4j.{Appender, Level, Logger}
 import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Outcome}
 
 import org.apache.spark.internal.Logging
-import org.apache.spark.util.AccumulatorContext
+import org.apache.spark.util.{AccumulatorContext, Utils}
 
 /**
  * Base abstract class for all unit tests in Spark for handling common functionality.
@@ -172,6 +172,17 @@ abstract class SparkFunSuite
       if (level.isDefined) {
         logger.setLevel(restoreLevel)
       }
+    }
+  }
+
+  /**
+   * Creates a temporary directory, which is then passed to `f` and will be deleted after `f`
+   * returns.
+   */
+  protected def withTempDir(f: File => Unit): Unit = {
+    val dir = Utils.createTempDir()
+    try f(dir) finally {
+      Utils.deleteRecursively(dir)
     }
   }
 }

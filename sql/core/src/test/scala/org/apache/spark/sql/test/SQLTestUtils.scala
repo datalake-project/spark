@@ -67,6 +67,17 @@ private[sql] trait SQLTestUtils extends SparkFunSuite with SQLTestUtilsBase with
   }
 
   /**
+   * Creates a temporary directory, which is then passed to `f` and will be deleted after `f`
+   * returns.
+   */
+  protected override def withTempDir(f: File => Unit): Unit = {
+    super.withTempDir { dir =>
+      f(dir)
+      waitForTasksToFinish()
+    }
+  }
+
+  /**
    * Materialize the test data immediately after the `SQLContext` is set up.
    * This is necessary if the data is accessed by name but not through direct reference.
    */
@@ -129,43 +140,6 @@ private[sql] trait SQLTestUtils extends SparkFunSuite with SQLTestUtilsBase with
       test(name) { runOnThread() }
     }
   }
-}
-
-/**
- * Helper trait that can be extended by all external SQL test suites.
- *
- * This allows subclasses to plugin a custom `SQLContext`.
- * To use implicit methods, import `testImplicits._` instead of through the `SQLContext`.
- *
- * Subclasses should *not* create `SQLContext`s in the test suite constructor, which is
- * prone to leaving multiple overlapping [[org.apache.spark.SparkContext]]s in the same JVM.
- */
-private[sql] trait SQLTestUtilsBase
-  extends Eventually
-  with BeforeAndAfterAll
-  with SQLTestData
-  with PlanTestBase { self: Suite =>
-
-  protected def sparkContext = spark.sparkContext
-
-  // Shorthand for running a query using our SQLContext
-  protected lazy val sql = spark.sql _
-
-  /**
-   * A helper object for importing SQL implicits.
-   *
-   * Note that the alternative of importing `spark.implicits._` is not possible here.
-   * This is because we create the `SQLContext` immediately before the first test is run,
-   * but the implicits import is needed in the constructor.
-   */
-  protected object testImplicits extends SQLImplicits {
-    protected override def _sqlContext: SQLContext = self.spark.sqlContext
-  }
-
-  protected override def withSQLConf(pairs: (String, String)*)(f: => Unit): Unit = {
-    SparkSession.setActiveSession(spark)
-    super.withSQLConf(pairs: _*)(f)
-  }
 
   /**
    * Generates a temporary path without creating the actual file/directory, then pass it to `f`. If
@@ -205,21 +179,6 @@ private[sql] trait SQLTestUtilsBase
   }
 
   /**
-   * Creates a temporary directory, which is then passed to `f` and will be deleted after `f`
-   * returns.
-   *
-   * @todo Probably this method should be moved to a more general place
-   */
-  protected def withTempDir(f: File => Unit): Unit = {
-    val dir = Utils.createTempDir().getCanonicalFile
-    try f(dir) finally {
-      // wait for all tasks to finish before deleting files
-      waitForTasksToFinish()
-      Utils.deleteRecursively(dir)
-    }
-  }
-
-  /**
    * Creates the specified number of temporary directories, which is then passed to `f` and will be
    * deleted after `f` returns.
    */
@@ -230,6 +189,43 @@ private[sql] trait SQLTestUtilsBase
       waitForTasksToFinish()
       files.foreach(Utils.deleteRecursively)
     }
+  }
+}
+
+/**
+ * Helper trait that can be extended by all external SQL test suites.
+ *
+ * This allows subclasses to plugin a custom `SQLContext`.
+ * To use implicit methods, import `testImplicits._` instead of through the `SQLContext`.
+ *
+ * Subclasses should *not* create `SQLContext`s in the test suite constructor, which is
+ * prone to leaving multiple overlapping [[org.apache.spark.SparkContext]]s in the same JVM.
+ */
+private[sql] trait SQLTestUtilsBase
+  extends Eventually
+  with BeforeAndAfterAll
+  with SQLTestData
+  with PlanTestBase { self: Suite =>
+
+  protected def sparkContext = spark.sparkContext
+
+  // Shorthand for running a query using our SQLContext
+  protected lazy val sql = spark.sql _
+
+  /**
+   * A helper object for importing SQL implicits.
+   *
+   * Note that the alternative of importing `spark.implicits._` is not possible here.
+   * This is because we create the `SQLContext` immediately before the first test is run,
+   * but the implicits import is needed in the constructor.
+   */
+  protected object testImplicits extends SQLImplicits {
+    protected override def _sqlContext: SQLContext = self.spark.sqlContext
+  }
+
+  protected override def withSQLConf(pairs: (String, String)*)(f: => Unit): Unit = {
+    SparkSession.setActiveSession(spark)
+    super.withSQLConf(pairs: _*)(f)
   }
 
   /**

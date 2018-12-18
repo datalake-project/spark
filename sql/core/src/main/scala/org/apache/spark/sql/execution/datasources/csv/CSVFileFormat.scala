@@ -192,5 +192,5 @@ private[csv] class CsvOutputWriter(
     gen.write(row)
   }
 
-  override def close(): Unit = univocityGenerator.map(_.close())
+  override def close(): Unit = univocityGenerator.foreach(_.close())
 }

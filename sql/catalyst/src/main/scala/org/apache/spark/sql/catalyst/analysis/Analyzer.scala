@@ -952,7 +952,7 @@ class Analyzer(
       case plan if containsDeserializer(plan.expressions) => plan
 
       case q: LogicalPlan =>
-        logTrace(s"Attempting to resolve ${q.simpleString}")
+        logTrace(s"Attempting to resolve ${q.simpleString(SQLConf.get.maxToStringFields)}")
         q.mapExpressions(resolve(_, q))
     }
 
@@ -1746,7 +1746,7 @@ class Analyzer(
 
       case p if p.expressions.exists(hasGenerator) =>
         throw new AnalysisException("Generators are not supported outside the SELECT clause, but " +
-          "got: " + p.simpleString)
+          "got: " + p.simpleString(SQLConf.get.maxToStringFields))
     }
   }
 

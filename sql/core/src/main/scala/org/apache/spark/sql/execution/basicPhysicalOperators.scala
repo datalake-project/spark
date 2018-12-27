@@ -585,7 +585,9 @@ case class RangeExec(range: org.apache.spark.sql.catalyst.plans.logical.Range)
       }
   }
 
-  override def simpleString: String = s"Range ($start, $end, step=$step, splits=$numSlices)"
+  override def simpleString(maxFields: Int): String = {
+    s"Range ($start, $end, step=$step, splits=$numSlices)"
+  }
 }
 
 /**

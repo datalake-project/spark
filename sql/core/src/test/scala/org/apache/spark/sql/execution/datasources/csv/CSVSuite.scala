@@ -52,7 +52,6 @@ class CSVSuite extends QueryTest with SharedSQLContext with SQLTestUtils with Te
   private val carsNullFile = "test-data/cars-null.csv"
   private val carsEmptyValueFile = "test-data/cars-empty-value.csv"
   private val carsBlankColName = "test-data/cars-blank-column-name.csv"
-  private val carsFilteredOutFile = "test-data/_cars.csv"
   private val emptyFile = "test-data/empty.csv"
   private val commentsFile = "test-data/comments.csv"
   private val disableCommentsFile = "test-data/disable_comments.csv"
@@ -333,25 +332,6 @@ class CSVSuite extends QueryTest with SharedSQLContext with SQLTestUtils with Te
 
     assert(result.collect.size === 0)
     assert(result.schema.fieldNames.size === 1)
-  }
-
-  test("SPARK-26339 Not throw an exception if some of specified paths are filtered in") {
-    val cars = spark
-      .read
-      .option("header", "false")
-      .csv(testFile(carsFile), testFile(carsFilteredOutFile))
-
-    verifyCars(cars, withHeader = false, checkTypes = false)
-  }
-
-  test("SPARK-26339 Throw an exception only if all of the specified paths are filtered out") {
-    val e = intercept[AnalysisException] {
-      val cars = spark
-        .read
-        .option("header", "false")
-        .csv(testFile(carsFilteredOutFile))
-    }.getMessage
-    assert(e.contains("All paths were ignored:"))
   }
 
   test("DDL test with empty file") {

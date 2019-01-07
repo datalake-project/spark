@@ -300,7 +300,8 @@ case class Join(
     left: LogicalPlan,
     right: LogicalPlan,
     joinType: JoinType,
-    condition: Option[Expression])
+    condition: Option[Expression],
+    hint: JoinHint)
   extends BinaryNode with PredicateHelper {
 
   override def output: Seq[Attribute] = {
@@ -361,6 +362,17 @@ case class Join(
     case NaturalJoin(_) => false
     case UsingJoin(_, _) => false
     case _ => resolvedExceptNatural
+  }
+
+  // Ignore hint for canonicalization
+  protected override def doCanonicalize(): LogicalPlan =
+    super.doCanonicalize().asInstanceOf[Join].copy(hint = JoinHint.NONE)
+
+  // Do not include an empty join hint in string description
+  protected override def stringArgs: Iterator[Any] = super.stringArgs.filter { e =>
+    (!e.isInstanceOf[JoinHint]
+      || e.asInstanceOf[JoinHint].leftHint.isDefined
+      || e.asInstanceOf[JoinHint].rightHint.isDefined)
   }
 }
 

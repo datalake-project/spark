@@ -64,8 +64,7 @@ object AggregateEstimation {
       Some(Statistics(
         sizeInBytes = getOutputSize(agg.output, outputRows, outputAttrStats),
         rowCount = Some(outputRows),
-        attributeStats = outputAttrStats,
-        hints = childStats.hints))
+        attributeStats = outputAttrStats))
     } else {
       None
     }

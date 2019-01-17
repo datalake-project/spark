@@ -90,9 +90,9 @@ class SQLMetricsSuite extends SharedSparkSession with SQLMetricsTestUtils {
     val df = testData2.groupBy().count() // 2 partitions
     val expected1 = Seq(
       Map("number of output rows" -> 2L,
-        "avg hash probe (min, med, max)" -> "\n(1, 1, 1)"),
+        "avg hash probe bucket list iters (min, med, max)" -> "\n(1, 1, 1)"),
       Map("number of output rows" -> 1L,
-        "avg hash probe (min, med, max)" -> "\n(1, 1, 1)"))
+        "avg hash probe bucket list iters (min, med, max)" -> "\n(1, 1, 1)"))
     testSparkPlanMetrics(df, 1, Map(
       2L -> (("HashAggregate", expected1(0))),
       0L -> (("HashAggregate", expected1(1))))
@@ -102,9 +102,9 @@ class SQLMetricsSuite extends SharedSparkSession with SQLMetricsTestUtils {
     val df2 = testData2.groupBy('a).count()
     val expected2 = Seq(
       Map("number of output rows" -> 4L,
-        "avg hash probe (min, med, max)" -> "\n(1, 1, 1)"),
+        "avg hash probe bucket list iters (min, med, max)" -> "\n(1, 1, 1)"),
       Map("number of output rows" -> 3L,
-        "avg hash probe (min, med, max)" -> "\n(1, 1, 1)"))
+        "avg hash probe bucket list iters (min, med, max)" -> "\n(1, 1, 1)"))
     testSparkPlanMetrics(df2, 1, Map(
       2L -> (("HashAggregate", expected2(0))),
       0L -> (("HashAggregate", expected2(1))))
@@ -144,7 +144,7 @@ class SQLMetricsSuite extends SharedSparkSession with SQLMetricsTestUtils {
       }
       val metrics = getSparkPlanMetrics(df, 1, nodeIds, enableWholeStage).get
       nodeIds.foreach { nodeId =>
-        val probes = metrics(nodeId)._2("avg hash probe (min, med, max)")
+        val probes = metrics(nodeId)._2("avg hash probe bucket list iters (min, med, max)")
         probes.toString.stripPrefix("\n(").stripSuffix(")").split(", ").foreach { probe =>
           assert(probe.toDouble > 1.0)
         }
@@ -518,7 +518,7 @@ class SQLMetricsSuite extends SharedSparkSession with SQLMetricsTestUtils {
       testSparkPlanMetrics(df, 1, Map(
         0L -> (("Scan parquet default.testdataforscan", Map(
           "number of output rows" -> 3L,
-          "number of files" -> 2L))))
+          "number of files read" -> 2L))))
       )
     }
   }

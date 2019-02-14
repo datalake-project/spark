@@ -105,10 +105,13 @@ object DataSourceV2Strategy extends Strategy with PredicateHelper {
   override def apply(plan: LogicalPlan): Seq[SparkPlan] = plan match {
     case PhysicalOperation(project, filters, relation: DataSourceV2Relation) =>
       val scanBuilder = relation.newScanBuilder()
+
+      val normalizedFilters = DataSourceStrategy.normalizeFilters(filters, relation.output)
+
       // `pushedFilters` will be pushed down and evaluated in the underlying data sources.
       // `postScanFilters` need to be evaluated after the scan.
       // `postScanFilters` and `pushedFilters` can overlap, e.g. the parquet row group filter.
-      val (pushedFilters, postScanFilters) = pushFilters(scanBuilder, filters)
+      val (pushedFilters, postScanFilters) = pushFilters(scanBuilder, normalizedFilters)
       val (scan, output) = pruneColumns(scanBuilder, relation, project ++ postScanFilters)
       logInfo(
         s"""

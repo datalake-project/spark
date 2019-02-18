@@ -951,6 +951,11 @@ class Analyzer(
       // rule: ResolveDeserializer.
       case plan if containsDeserializer(plan.expressions) => plan
 
+      case o: OverwriteByExpression if !o.outputResolved =>
+        // do not resolve expression attributes until the query attributes are resolved against the
+        // table by ResolveOutputRelation. that rule will alias the attributes to the table's names.
+        o
+
       case q: LogicalPlan =>
         logTrace(s"Attempting to resolve ${q.simpleString(SQLConf.get.maxToStringFields)}")
         q.mapExpressions(resolve(_, q))
@@ -2239,13 +2244,33 @@ class Analyzer(
   object ResolveOutputRelation extends Rule[LogicalPlan] {
     override def apply(plan: LogicalPlan): LogicalPlan = plan.resolveOperators {
       case append @ AppendData(table, query, isByName)
-          if table.resolved && query.resolved && !append.resolved =>
+          if table.resolved && query.resolved && !append.outputResolved =>
         val projection = resolveOutputColumns(table.name, table.output, query, isByName)
 
         if (projection != query) {
           append.copy(query = projection)
         } else {
           append
+        }
+
+      case overwrite @ OverwriteByExpression(table, _, query, isByName)
+          if table.resolved && query.resolved && !overwrite.outputResolved =>
+        val projection = resolveOutputColumns(table.name, table.output, query, isByName)
+
+        if (projection != query) {
+          overwrite.copy(query = projection)
+        } else {
+          overwrite
+        }
+
+      case overwrite @ OverwritePartitionsDynamic(table, query, isByName)
+          if table.resolved && query.resolved && !overwrite.outputResolved =>
+        val projection = resolveOutputColumns(table.name, table.output, query, isByName)
+
+        if (projection != query) {
+          overwrite.copy(query = projection)
+        } else {
+          overwrite
         }
     }
 

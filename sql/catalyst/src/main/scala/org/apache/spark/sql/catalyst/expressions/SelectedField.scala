@@ -15,9 +15,8 @@
  * limitations under the License.
  */
 
-package org.apache.spark.sql.execution
+package org.apache.spark.sql.catalyst.expressions
 
-import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.types._
 
 /**
@@ -54,7 +53,7 @@ import org.apache.spark.sql.types._
  *
  * @param expr the top-level complex type extractor
  */
-private[execution] object SelectedField {
+object SelectedField {
   def unapply(expr: Expression): Option[StructField] = {
     // If this expression is an alias, work on its child instead
     val unaliased = expr match {

@@ -186,6 +186,7 @@ statement
     | (DESC | DESCRIBE) database EXTENDED? identifier                  #describeDatabase
     | (DESC | DESCRIBE) TABLE? option=(EXTENDED | FORMATTED)?
         tableIdentifier partitionSpec? describeColName?                #describeTable
+    | (DESC | DESCRIBE) QUERY? queryToDesc                             #describeQuery
     | REFRESH TABLE tableIdentifier                                    #refreshTable
     | REFRESH (STRING | .*?)                                           #refreshResource
     | CACHE LAZY? TABLE tableIdentifier (AS? query)?                   #cacheTable
@@ -272,6 +273,10 @@ locationSpec
 
 query
     : ctes? queryNoWith
+    ;
+
+queryToDesc
+    : queryTerm queryOrganization
     ;
 
 insertInto
@@ -964,6 +969,7 @@ ansiNonReserved
     | PRECEDING
     | PRINCIPALS
     | PURGE
+    | QUERY
     | RANGE
     | RECORDREADER
     | RECORDWRITER
@@ -1212,6 +1218,7 @@ nonReserved
     | PRIMARY
     | PRINCIPALS
     | PURGE
+    | QUERY
     | RANGE
     | RECORDREADER
     | RECORDWRITER

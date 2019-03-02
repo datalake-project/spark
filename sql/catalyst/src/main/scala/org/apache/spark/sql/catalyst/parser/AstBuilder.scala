@@ -140,6 +140,10 @@ class AstBuilder(conf: SQLConf) extends SqlBaseBaseVisitor[AnyRef] with Logging 
     plan(ctx.queryTerm).optionalMap(ctx.queryOrganization)(withQueryResultClauses)
   }
 
+  override def visitQueryToDesc(ctx: QueryToDescContext): LogicalPlan = withOrigin(ctx) {
+    plan(ctx.queryTerm).optionalMap(ctx.queryOrganization)(withQueryResultClauses)
+  }
+
   /**
    * Create a named logical plan.
    *

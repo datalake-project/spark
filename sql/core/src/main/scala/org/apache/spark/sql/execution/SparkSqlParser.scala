@@ -388,6 +388,13 @@ class SparkSqlAstBuilder(conf: SQLConf) extends AstBuilder(conf) {
   }
 
   /**
+   * Create a [[DescribeQueryCommand]] logical command.
+   */
+  override def visitDescribeQuery(ctx: DescribeQueryContext): LogicalPlan = withOrigin(ctx) {
+    DescribeQueryCommand(visitQueryToDesc(ctx.queryToDesc()))
+  }
+
+  /**
    * Create a table, returning a [[CreateTable]] logical plan.
    *
    * This is used to produce CreateTempViewUsing from CREATE TEMPORARY TABLE.

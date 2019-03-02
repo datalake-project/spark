@@ -188,6 +188,7 @@ class TableIdentifierParserSuite extends SparkFunSuite with SQLHelper {
     "procedure",
     "protection",
     "purge",
+    "query",
     "range",
     "read",
     "readonly",

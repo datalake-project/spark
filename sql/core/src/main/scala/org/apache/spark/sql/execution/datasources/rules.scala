@@ -209,6 +209,8 @@ case class PreprocessTableCreation(sparkSession: SparkSession) extends Rule[Logi
         val analyzedQuery = query.get
         val normalizedTable = normalizeCatalogTable(analyzedQuery.schema, tableDesc)
 
+        DDLUtils.checkDataColNames(tableDesc.copy(schema = analyzedQuery.schema))
+
         val output = analyzedQuery.output
         val partitionAttrs = normalizedTable.partitionColumnNames.map { partCol =>
           output.find(_.name == partCol).get
@@ -222,6 +224,7 @@ case class PreprocessTableCreation(sparkSession: SparkSession) extends Rule[Logi
 
         c.copy(tableDesc = normalizedTable, query = Some(reorderedQuery))
       } else {
+        DDLUtils.checkDataColNames(tableDesc)
         val normalizedTable = normalizeCatalogTable(tableDesc.schema, tableDesc)
 
         val partitionSchema = normalizedTable.partitionColumnNames.map { partCol =>

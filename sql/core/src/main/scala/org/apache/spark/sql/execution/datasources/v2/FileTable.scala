@@ -36,15 +36,16 @@ abstract class FileTable(
   extends Table with SupportsRead with SupportsWrite {
 
   lazy val fileIndex: PartitioningAwareFileIndex = {
-    val scalaMap = options.asScala.toMap
-    val hadoopConf = sparkSession.sessionState.newHadoopConfWithOptions(scalaMap)
+    val caseSensitiveMap = options.asCaseSensitiveMap.asScala.toMap
+    // Hadoop Configurations are case sensitive.
+    val hadoopConf = sparkSession.sessionState.newHadoopConfWithOptions(caseSensitiveMap)
     // This is an internal config so must be present.
     val checkFilesExist = options.get("check_files_exist").toBoolean
     val rootPathsSpecified = DataSource.checkAndGlobPathIfNecessary(paths, hadoopConf,
       checkEmptyGlobPath = true, checkFilesExist = checkFilesExist)
     val fileStatusCache = FileStatusCache.getOrCreate(sparkSession)
     new InMemoryFileIndex(
-      sparkSession, rootPathsSpecified, scalaMap, userSpecifiedSchema, fileStatusCache)
+      sparkSession, rootPathsSpecified, caseSensitiveMap, userSpecifiedSchema, fileStatusCache)
   }
 
   lazy val dataSchema: StructType = userSpecifiedSchema.orElse {

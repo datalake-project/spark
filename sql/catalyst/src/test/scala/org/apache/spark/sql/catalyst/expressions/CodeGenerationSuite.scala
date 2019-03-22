@@ -519,7 +519,7 @@ class CodeGenerationSuite extends SparkFunSuite with ExpressionEvalHelper {
     }
 
     val appender = new MockAppender()
-    withLogAppender(appender) {
+    withLogAppender(appender, loggerName = Some(classOf[CodeGenerator[_, _]].getName)) {
       val x = 42
       val expr = HugeCodeIntExpression(x)
       val proj = GenerateUnsafeProjection.generate(Seq(expr))
@@ -527,15 +527,6 @@ class CodeGenerationSuite extends SparkFunSuite with ExpressionEvalHelper {
       assert(actual.getInt(0) == x)
     }
     assert(appender.seenMessage)
-  }
-
-  private def withLogAppender(appender: Appender)(f: => Unit): Unit = {
-    val logger =
-      Logger.getLogger(classOf[CodeGenerator[_, _]].getName)
-    logger.addAppender(appender)
-    try f finally {
-      logger.removeAppender(appender)
-    }
   }
 }
 

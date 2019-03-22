@@ -22,6 +22,7 @@ import java.io.File
 
 import scala.annotation.tailrec
 
+import org.apache.log4j.{Appender, Level, Logger}
 import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, BeforeAndAfterEach, FunSuite, Outcome}
 
 import org.apache.spark.internal.Logging
@@ -150,4 +151,27 @@ abstract class SparkFunSuite
     }
   }
 
+  /**
+   * Adds a log appender and optionally sets a log level to the root logger or the logger with
+   * the specified name, then executes the specified function, and in the end removes the log
+   * appender and restores the log level if necessary.
+   */
+  protected def withLogAppender(
+      appender: Appender,
+      loggerName: Option[String] = None,
+      level: Option[Level] = None)(
+      f: => Unit): Unit = {
+    val logger = loggerName.map(Logger.getLogger).getOrElse(Logger.getRootLogger)
+    val restoreLevel = logger.getLevel
+    logger.addAppender(appender)
+    if (level.isDefined) {
+      logger.setLevel(level.get)
+    }
+    try f finally {
+      logger.removeAppender(appender)
+      if (level.isDefined) {
+        logger.setLevel(restoreLevel)
+      }
+    }
+  }
 }

@@ -41,8 +41,8 @@ class StateStoreCoordinatorSuite extends SparkFunSuite with SharedSparkContext {
       assert(coordinatorRef.getLocation(id) === None)
 
       coordinatorRef.reportActiveInstance(id, "hostX", "exec1")
-      eventually(timeout(5 seconds)) {
-        assert(coordinatorRef.verifyIfInstanceActive(id, "exec1") === true)
+      eventually(timeout(5.seconds)) {
+        assert(coordinatorRef.verifyIfInstanceActive(id, "exec1"))
         assert(
           coordinatorRef.getLocation(id) ===
             Some(ExecutorCacheTaskLocation("hostX", "exec1").toString))
@@ -50,7 +50,7 @@ class StateStoreCoordinatorSuite extends SparkFunSuite with SharedSparkContext {
 
       coordinatorRef.reportActiveInstance(id, "hostX", "exec2")
 
-      eventually(timeout(5 seconds)) {
+      eventually(timeout(5.seconds)) {
         assert(coordinatorRef.verifyIfInstanceActive(id, "exec1") === false)
         assert(coordinatorRef.verifyIfInstanceActive(id, "exec2") === true)
 
@@ -75,10 +75,10 @@ class StateStoreCoordinatorSuite extends SparkFunSuite with SharedSparkContext {
       coordinatorRef.reportActiveInstance(id2, host, exec)
       coordinatorRef.reportActiveInstance(id3, host, exec)
 
-      eventually(timeout(5 seconds)) {
-        assert(coordinatorRef.verifyIfInstanceActive(id1, exec) === true)
-        assert(coordinatorRef.verifyIfInstanceActive(id2, exec) === true)
-        assert(coordinatorRef.verifyIfInstanceActive(id3, exec) === true)
+      eventually(timeout(5.seconds)) {
+        assert(coordinatorRef.verifyIfInstanceActive(id1, exec))
+        assert(coordinatorRef.verifyIfInstanceActive(id2, exec))
+        assert(coordinatorRef.verifyIfInstanceActive(id3, exec))
       }
 
       coordinatorRef.deactivateInstances(runId1)
@@ -107,8 +107,8 @@ class StateStoreCoordinatorSuite extends SparkFunSuite with SharedSparkContext {
 
       coordRef1.reportActiveInstance(id, "hostX", "exec1")
 
-      eventually(timeout(5 seconds)) {
-        assert(coordRef2.verifyIfInstanceActive(id, "exec1") === true)
+      eventually(timeout(5.seconds)) {
+        assert(coordRef2.verifyIfInstanceActive(id, "exec1"))
         assert(
           coordRef2.getLocation(id) ===
             Some(ExecutorCacheTaskLocation("hostX", "exec1").toString))

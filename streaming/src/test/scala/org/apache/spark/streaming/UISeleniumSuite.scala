@@ -98,12 +98,12 @@ class UISeleniumSuite
 
       sparkUI.getDelegatingHandlers.count(_.getContextPath.contains("/streaming")) should be (5)
 
-      eventually(timeout(10 seconds), interval(50 milliseconds)) {
+      eventually(timeout(10.seconds), interval(50.milliseconds)) {
         go to (sparkUI.webUrl.stripSuffix("/"))
         find(cssSelector( """ul li a[href*="streaming"]""")) should not be (None)
       }
 
-      eventually(timeout(10 seconds), interval(50 milliseconds)) {
+      eventually(timeout(10.seconds), interval(50.milliseconds)) {
         // check whether streaming page exists
         go to (sparkUI.webUrl.stripSuffix("/") + "/streaming")
         val h3Text = findAll(cssSelector("h3")).map(_.text).toSeq
@@ -199,12 +199,12 @@ class UISeleniumSuite
 
       sparkUI.getDelegatingHandlers.count(_.getContextPath.contains("/streaming")) should be (0)
 
-      eventually(timeout(10 seconds), interval(50 milliseconds)) {
+      eventually(timeout(10.seconds), interval(50.milliseconds)) {
         go to (sparkUI.webUrl.stripSuffix("/"))
         find(cssSelector( """ul li a[href*="streaming"]""")) should be(None)
       }
 
-      eventually(timeout(10 seconds), interval(50 milliseconds)) {
+      eventually(timeout(10.seconds), interval(50.milliseconds)) {
         go to (sparkUI.webUrl.stripSuffix("/") + "/streaming")
         val h3Text = findAll(cssSelector("h3")).map(_.text).toSeq
         h3Text should not contain("Streaming Statistics")

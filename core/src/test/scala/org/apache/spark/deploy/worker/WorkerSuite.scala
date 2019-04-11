@@ -222,7 +222,7 @@ class WorkerSuite extends SparkFunSuite with Matchers with BeforeAndAfter {
     testCleanupFilesWithConfig(false)
   }
 
-  private def testCleanupFilesWithConfig(value: Boolean) = {
+  private def testCleanupFilesWithConfig(value: Boolean): Unit = {
     val conf = new SparkConf().set("spark.storage.cleanupFilesAfterExecutorExit", value.toString)
 
     val cleanupCalled = new AtomicBoolean(false)

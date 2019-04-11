@@ -306,7 +306,7 @@ class TextSocketStreamSuite extends StreamTest with SharedSparkSession {
     val offsets = scala.collection.mutable.ListBuffer[Int]()
     val readerFactory = stream.createContinuousReaderFactory()
     import org.scalatest.time.SpanSugar._
-    failAfter(5 seconds) {
+    failAfter(5.seconds) {
       // inject rows, read and check the data and offsets
       for (i <- 0 until numRecords) {
         serverThread.enqueue(i.toString)

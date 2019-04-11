@@ -63,7 +63,7 @@ class ReceiverSuite extends TestSuiteBase with TimeLimits with Serializable {
 
     // Verify that the receiver
     intercept[Exception] {
-      failAfter(200 millis) {
+      failAfter(200.milliseconds) {
         executingThread.join()
       }
     }
@@ -77,7 +77,7 @@ class ReceiverSuite extends TestSuiteBase with TimeLimits with Serializable {
     assert(receiver.isStarted)
     assert(!receiver.isStopped())
     assert(receiver.otherThread.isAlive)
-    eventually(timeout(100 millis), interval(10 millis)) {
+    eventually(timeout(100.milliseconds), interval(10.milliseconds)) {
       assert(receiver.receiving)
     }
 
@@ -124,7 +124,7 @@ class ReceiverSuite extends TestSuiteBase with TimeLimits with Serializable {
     }
 
     // Verify that stopping actually stops the thread
-    failAfter(1.second) {
+    failAfter(100.milliseconds) {
       receiver.stop("test")
       assert(receiver.isStopped)
       assert(!receiver.otherThread.isAlive)
@@ -161,7 +161,7 @@ class ReceiverSuite extends TestSuiteBase with TimeLimits with Serializable {
 
     val recordedBlocks = blockGeneratorListener.arrayBuffers
     val recordedData = recordedBlocks.flatten
-    assert(blockGeneratorListener.arrayBuffers.size > 0, "No blocks received")
+    assert(blockGeneratorListener.arrayBuffers.nonEmpty, "No blocks received")
     assert(recordedData.toSet === generatedData.toSet, "Received data not same")
 
     // recordedData size should be close to the expected rate; use an error margin proportional to
@@ -247,15 +247,15 @@ class ReceiverSuite extends TestSuiteBase with TimeLimits with Serializable {
 
       // Run until sufficient WAL files have been generated and
       // the first WAL files has been deleted
-      eventually(timeout(20 seconds), interval(batchDuration.milliseconds millis)) {
+      eventually(timeout(20.seconds), interval(batchDuration.milliseconds.millis)) {
         val (logFiles1, logFiles2) = getBothCurrentLogFiles()
         allLogFiles1 ++= logFiles1
         allLogFiles2 ++= logFiles2
-        if (allLogFiles1.size > 0) {
-          assert(!logFiles1.contains(allLogFiles1.toSeq.sorted.head))
+        if (allLogFiles1.nonEmpty) {
+          assert(!logFiles1.contains(allLogFiles1.toSeq.min))
         }
-        if (allLogFiles2.size > 0) {
-          assert(!logFiles2.contains(allLogFiles2.toSeq.sorted.head))
+        if (allLogFiles2.nonEmpty) {
+          assert(!logFiles2.contains(allLogFiles2.toSeq.min))
         }
         assert(allLogFiles1.size >= 7)
         assert(allLogFiles2.size >= 7)

@@ -24,7 +24,6 @@ import java.util.concurrent.TimeUnit
 import java.util.zip.{ZipInputStream, ZipOutputStream}
 
 import scala.concurrent.duration._
-import scala.language.postfixOps
 
 import com.google.common.io.{ByteStreams, Files}
 import org.apache.hadoop.fs.{FileStatus, FileSystem, FSDataInputStream, Path}
@@ -141,7 +140,7 @@ class FsHistoryProviderSuite extends SparkFunSuite with Matchers with Logging {
         clock.getTimeMillis(), "test", false))
 
       // Make sure the UI can be rendered.
-      list.foreach { case info =>
+      list.foreach { info =>
         val appUi = provider.getAppUI(info.id, None)
         appUi should not be null
         appUi should not be None
@@ -280,7 +279,7 @@ class FsHistoryProviderSuite extends SparkFunSuite with Matchers with Logging {
       list.last.attempts.size should be (3)
       list.head.attempts.head.attemptId should be (Some("attempt1"))
 
-      list.foreach { case app =>
+      list.foreach { app =>
         app.attempts.foreach { attempt =>
           val appUi = provider.getAppUI(app.id, attempt.attemptId)
           appUi should not be null
@@ -491,7 +490,7 @@ class FsHistoryProviderSuite extends SparkFunSuite with Matchers with Logging {
       provider.inSafeMode = false
       clock.setTime(10000)
 
-      eventually(timeout(3.second), interval(10.milliseconds)) {
+      eventually(timeout(1.second), interval(10.milliseconds)) {
         provider.getConfig().keys should not contain ("HDFS State")
       }
     } finally {
@@ -504,12 +503,12 @@ class FsHistoryProviderSuite extends SparkFunSuite with Matchers with Logging {
     val clock = new ManualClock()
     val provider = new SafeModeTestProvider(createTestConf(), clock)
     val errorHandler = mock(classOf[Thread.UncaughtExceptionHandler])
-    val initThread = provider.startSafeModeCheckThread(Some(errorHandler))
+    provider.startSafeModeCheckThread(Some(errorHandler))
     try {
       provider.inSafeMode = false
       clock.setTime(10000)
 
-      eventually(timeout(3.second), interval(10.milliseconds)) {
+      eventually(timeout(1.second), interval(10.milliseconds)) {
         verify(errorHandler).uncaughtException(any(), any())
       }
     } finally {

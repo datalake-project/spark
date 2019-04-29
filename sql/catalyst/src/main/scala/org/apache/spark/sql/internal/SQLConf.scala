@@ -1623,6 +1623,14 @@ object SQLConf {
       .doc("Name of the default v2 catalog, used when a catalog is not identified in queries")
       .stringConf
       .createOptional
+
+  val SOURCES_BINARY_FILE_MAX_LENGTH = buildConf("spark.sql.sources.binaryFile.maxLength")
+    .doc("The max length of a file that can be read by the binary file data source. " +
+      "Spark will fail fast and not attempt to read the file if its length exceeds this value. " +
+      "The theoretical max is Int.MaxValue, though VMs might implement a smaller max.")
+    .internal()
+    .intConf
+    .createWithDefault(Int.MaxValue)
 }
 
 /**

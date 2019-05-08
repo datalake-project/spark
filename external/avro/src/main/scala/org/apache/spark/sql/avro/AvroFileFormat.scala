@@ -57,6 +57,10 @@ private[avro] class AvroFileFormat extends FileFormat
       options: Map[String, String],
       files: Seq[FileStatus]): Option[StructType] = {
     val conf = spark.sessionState.newHadoopConf()
+    if (options.contains("ignoreExtension")) {
+      logWarning(s"Option ${AvroOptions.ignoreExtensionKey} is deprecated. Please use the " +
+        "general data source option pathGlobFilter for filtering file names.")
+    }
     val parsedOptions = new AvroOptions(options, conf)
 
     // Schema evolution is not supported yet. Here we only pick a single random sample file to

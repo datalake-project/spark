@@ -1604,6 +1604,11 @@ object SQLConf {
       """ "... N more fields" placeholder.""")
     .intConf
     .createWithDefault(25)
+
+  val DEFAULT_V2_CATALOG = buildConf("spark.sql.default.catalog")
+      .doc("Name of the default v2 catalog, used when a catalog is not identified in queries")
+      .stringConf
+      .createOptional
 }
 
 /**
@@ -2026,6 +2031,8 @@ class SQLConf extends Serializable with Logging {
   def setOpsPrecedenceEnforced: Boolean = getConf(SQLConf.LEGACY_SETOPS_PRECEDENCE_ENABLED)
 
   def maxToStringFields: Int = getConf(SQLConf.MAX_TO_STRING_FIELDS)
+
+  def defaultV2Catalog: Option[String] = getConf(DEFAULT_V2_CATALOG)
 
   /** ********************** SQLConf functionality methods ************ */
 

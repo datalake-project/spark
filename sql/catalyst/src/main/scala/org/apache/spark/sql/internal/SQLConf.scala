@@ -1613,24 +1613,29 @@ object SQLConf {
       .createWithDefault(false)
 
   val MAX_TO_STRING_FIELDS = buildConf("spark.sql.debug.maxToStringFields")
-    .doc("Maximum number of fields of sequence-like entries can be converted to strings " +
-      "in debug output. Any elements beyond the limit will be dropped and replaced by a" +
-      """ "... N more fields" placeholder.""")
-    .intConf
-    .createWithDefault(25)
+      .doc("Maximum number of fields of sequence-like entries can be converted to strings " +
+        "in debug output. Any elements beyond the limit will be dropped and replaced by a" +
+        """ "... N more fields" placeholder.""")
+      .intConf
+      .createWithDefault(25)
 
   val DEFAULT_V2_CATALOG = buildConf("spark.sql.default.catalog")
       .doc("Name of the default v2 catalog, used when a catalog is not identified in queries")
       .stringConf
       .createOptional
 
+  val LEGACY_LOOSE_UPCAST = buildConf("spark.sql.legacy.looseUpcast")
+      .doc("When true, the upcast will be loose and allows string to atomic types.")
+      .booleanConf
+      .createWithDefault(false)
+
   val SOURCES_BINARY_FILE_MAX_LENGTH = buildConf("spark.sql.sources.binaryFile.maxLength")
-    .doc("The max length of a file that can be read by the binary file data source. " +
-      "Spark will fail fast and not attempt to read the file if its length exceeds this value. " +
-      "The theoretical max is Int.MaxValue, though VMs might implement a smaller max.")
-    .internal()
-    .intConf
-    .createWithDefault(Int.MaxValue)
+      .doc("The max length of a file that can be read by the binary file data source. " +
+        "Spark will fail fast and not attempt to read the file if its length exceeds this value. " +
+        "The theoretical max is Int.MaxValue, though VMs might implement a smaller max.")
+      .internal()
+      .intConf
+      .createWithDefault(Int.MaxValue)
 
   val V2_SESSION_CATALOG = buildConf("spark.sql.catalog.session")
       .doc("Name of the default v2 catalog, used when a catalog is not identified in queries")

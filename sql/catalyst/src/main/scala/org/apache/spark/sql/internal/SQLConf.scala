@@ -1596,15 +1596,6 @@ object SQLConf {
       .booleanConf
       .createWithDefault(false)
 
-  val LEGACY_PASS_PARTITION_BY_AS_OPTIONS =
-    buildConf("spark.sql.legacy.sources.write.passPartitionByAsOptions")
-      .internal()
-      .doc("Whether to pass the partitionBy columns as options in DataFrameWriter. " +
-        "Data source V1 now silently drops partitionBy columns for non-file-format sources; " +
-        "turning the flag on provides a way for these sources to see these partitionBy columns.")
-      .booleanConf
-      .createWithDefault(false)
-
   val MAX_TO_STRING_FIELDS = buildConf("spark.sql.debug.maxToStringFields")
       .doc("Maximum number of fields of sequence-like entries can be converted to strings " +
         "in debug output. Any elements beyond the limit will be dropped and replaced by a" +

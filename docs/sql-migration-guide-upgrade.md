@@ -7,7 +7,8 @@ displayTitle: Spark SQL Upgrading Guide
 * Table of contents
 {:toc}
 
-## Upgrading from Spark SQL 2.4 to 2.4.1
+## Upgrading From Spark SQL 2.4 to 3.0
+  - In Spark version 2.4 and earlier, SQL queries such as `FROM <table>` or `FROM <table> UNION ALL FROM <table>` are supported by accident. In hive-style `FROM <table> SELECT <expr>`, the `SELECT` clause is not negligible. Neither Hive nor Presto support this syntax. Therefore we will treat these queries as invalid since Spark 3.0.
 
   - The value of `spark.executor.heartbeatInterval`, when specified without units like "30" rather than "30s", was
     inconsistently interpreted as both seconds and milliseconds in Spark 2.4.0 in different parts of the code.

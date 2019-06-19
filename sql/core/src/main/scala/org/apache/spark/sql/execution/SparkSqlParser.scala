@@ -487,7 +487,7 @@ class SparkSqlAstBuilder(conf: SQLConf) extends AstBuilder(conf) {
     checkDuplicateClauses(ctx.DBPROPERTIES, "WITH DBPROPERTIES", ctx)
 
     CreateDatabaseCommand(
-      ctx.identifier.getText,
+      ctx.db.getText,
       ctx.EXISTS != null,
       ctx.locationSpec.asScala.headOption.map(visitLocationSpec),
       Option(ctx.comment).map(string),
@@ -505,7 +505,7 @@ class SparkSqlAstBuilder(conf: SQLConf) extends AstBuilder(conf) {
   override def visitSetDatabaseProperties(
       ctx: SetDatabasePropertiesContext): LogicalPlan = withOrigin(ctx) {
     AlterDatabasePropertiesCommand(
-      ctx.identifier.getText,
+      ctx.db.getText,
       visitPropertyKeyValues(ctx.tablePropertyList))
   }
 
@@ -518,7 +518,7 @@ class SparkSqlAstBuilder(conf: SQLConf) extends AstBuilder(conf) {
    * }}}
    */
   override def visitDropDatabase(ctx: DropDatabaseContext): LogicalPlan = withOrigin(ctx) {
-    DropDatabaseCommand(ctx.identifier.getText, ctx.EXISTS != null, ctx.CASCADE != null)
+    DropDatabaseCommand(ctx.db.getText, ctx.EXISTS != null, ctx.CASCADE != null)
   }
 
   /**
@@ -530,7 +530,7 @@ class SparkSqlAstBuilder(conf: SQLConf) extends AstBuilder(conf) {
    * }}}
    */
   override def visitDescribeDatabase(ctx: DescribeDatabaseContext): LogicalPlan = withOrigin(ctx) {
-    DescribeDatabaseCommand(ctx.identifier.getText, ctx.EXTENDED != null)
+    DescribeDatabaseCommand(ctx.db.getText, ctx.EXTENDED != null)
   }
 
   /**
@@ -784,7 +784,7 @@ class SparkSqlAstBuilder(conf: SQLConf) extends AstBuilder(conf) {
 
     AlterTableChangeColumnCommand(
       tableName = visitTableIdentifier(ctx.tableIdentifier),
-      columnName = ctx.identifier.getText,
+      columnName = ctx.colName.getText,
       newColumn = visitColType(ctx.colType))
   }
 

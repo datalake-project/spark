@@ -27,6 +27,7 @@ import org.apache.spark.sql.catalyst.expressions.ExpressionInfo
 import org.apache.spark.sql.catalyst.parser.ParserInterface
 import org.apache.spark.sql.catalyst.plans.logical.LogicalPlan
 import org.apache.spark.sql.catalyst.rules.Rule
+import org.apache.spark.sql.execution.ColumnarRule
 
 /**
  * :: Experimental ::
@@ -42,6 +43,7 @@ import org.apache.spark.sql.catalyst.rules.Rule
  * <li>Planning Strategies.</li>
  * <li>Customized Parser.</li>
  * <li>(External) Catalog listeners.</li>
+ * <li>Columnar Rules.</li>
  * </ul>
  *
  * The extensions can be used by calling withExtension on the [[SparkSession.Builder]], for
@@ -72,6 +74,23 @@ class SparkSessionExtensions {
   type CheckRuleBuilder = SparkSession => LogicalPlan => Unit
   type StrategyBuilder = SparkSession => Strategy
   type ParserBuilder = (SparkSession, ParserInterface) => ParserInterface
+  type ColumnarRuleBuilder = SparkSession => ColumnarRule
+
+  private[this] val columnarRuleBuilders = mutable.Buffer.empty[ColumnarRuleBuilder]
+
+  /**
+   * Build the override rules for columnar execution.
+   */
+  private[sql] def buildColumnarRules(session: SparkSession): Seq[ColumnarRule] = {
+    columnarRuleBuilders.map(_.apply(session))
+  }
+
+  /**
+   * Inject a rule that can override the columnar execution of an executor.
+   */
+  def injectColumnar(builder: ColumnarRuleBuilder): Unit = {
+    columnarRuleBuilders += builder
+  }
 
   private[this] val resolutionRuleBuilders = mutable.Buffer.empty[RuleBuilder]
 

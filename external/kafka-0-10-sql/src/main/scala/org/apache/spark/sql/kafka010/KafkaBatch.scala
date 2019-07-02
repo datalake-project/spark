@@ -19,40 +19,30 @@ package org.apache.spark.sql.kafka010
 
 import org.apache.kafka.common.TopicPartition
 
+import org.apache.spark.SparkEnv
 import org.apache.spark.internal.Logging
-import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{Row, SQLContext}
-import org.apache.spark.sql.catalyst.InternalRow
-import org.apache.spark.sql.catalyst.util.DateTimeUtils
-import org.apache.spark.sql.sources.{BaseRelation, TableScan}
-import org.apache.spark.sql.types.StructType
-import org.apache.spark.unsafe.types.UTF8String
+import org.apache.spark.sql.sources.v2.reader.{Batch, InputPartition, PartitionReaderFactory}
 
 
-private[kafka010] class KafkaRelation(
-    override val sqlContext: SQLContext,
+private[kafka010] class KafkaBatch(
     strategy: ConsumerStrategy,
     sourceOptions: Map[String, String],
     specifiedKafkaParams: Map[String, String],
     failOnDataLoss: Boolean,
     startingOffsets: KafkaOffsetRangeLimit,
     endingOffsets: KafkaOffsetRangeLimit)
-  extends BaseRelation with TableScan with Logging {
+  extends Batch with Logging {
   assert(startingOffsets != LatestOffsetRangeLimit,
     "Starting offset not allowed to be set to latest offsets.")
   assert(endingOffsets != EarliestOffsetRangeLimit,
     "Ending offset not allowed to be set to earliest offsets.")
 
   private val pollTimeoutMs = sourceOptions.getOrElse(
-    "kafkaConsumer.pollTimeoutMs",
-    (sqlContext.sparkContext.conf.getTimeAsSeconds(
-      "spark.network.timeout",
-      "120s") * 1000L).toString
+    "kafkaconsumer.polltimeoutms",
+    (SparkEnv.get.conf.getTimeAsSeconds("spark.network.timeout", "120s") * 1000L).toString
   ).toLong
 
-  override def schema: StructType = KafkaOffsetReader.kafkaSchema
-
-  override def buildScan(): RDD[Row] = {
+  override def planInputPartitions(): Array[InputPartition] = {
     // Each running query should use its own group id. Otherwise, the query may be only assigned
     // partial data since Kafka will assign partitions to multiple consumers having the same group
     // id. Hence, we should generate a unique id for each query.
@@ -87,36 +77,26 @@ private[kafka010] class KafkaRelation(
 
     // Calculate offset ranges
     val offsetRanges = untilPartitionOffsets.keySet.map { tp =>
-      val fromOffset = fromPartitionOffsets.get(tp).getOrElse {
-          // This should not happen since topicPartitions contains all partitions not in
-          // fromPartitionOffsets
-          throw new IllegalStateException(s"$tp doesn't have a from offset")
-      }
+      val fromOffset = fromPartitionOffsets.getOrElse(tp,
+        // This should not happen since topicPartitions contains all partitions not in
+        // fromPartitionOffsets
+        throw new IllegalStateException(s"$tp doesn't have a from offset"))
       val untilOffset = untilPartitionOffsets(tp)
-      KafkaSourceRDDOffsetRange(tp, fromOffset, untilOffset, None)
+      KafkaOffsetRange(tp, fromOffset, untilOffset, None)
     }.toArray
 
-    logInfo("GetBatch generating RDD of offset range: " +
-      offsetRanges.sortBy(_.topicPartition.toString).mkString(", "))
-
-    // Create an RDD that reads from Kafka and get the (key, value) pair as byte arrays.
     val executorKafkaParams =
       KafkaSourceProvider.kafkaParamsForExecutors(specifiedKafkaParams, uniqueGroupId)
-    val rdd = new KafkaSourceRDD(
-      sqlContext.sparkContext, executorKafkaParams, offsetRanges,
-      pollTimeoutMs, failOnDataLoss, reuseKafkaConsumer = false).map { cr =>
-      InternalRow(
-        cr.key,
-        cr.value,
-        UTF8String.fromString(cr.topic),
-        cr.partition,
-        cr.offset,
-        DateTimeUtils.fromJavaTimestamp(new java.sql.Timestamp(cr.timestamp)),
-        cr.timestampType.id)
-    }
-    sqlContext.internalCreateDataFrame(rdd.setName("kafka"), schema).rdd
+    offsetRanges.map { range =>
+      new KafkaBatchInputPartition(
+        range, executorKafkaParams, pollTimeoutMs, failOnDataLoss, false)
+    }.toArray
+  }
+
+  override def createReaderFactory(): PartitionReaderFactory = {
+    KafkaBatchReaderFactory
   }
 
   override def toString: String =
-    s"KafkaRelation(strategy=$strategy, start=$startingOffsets, end=$endingOffsets)"
+    s"KafkaBatch(strategy=$strategy, start=$startingOffsets, end=$endingOffsets)"
 }

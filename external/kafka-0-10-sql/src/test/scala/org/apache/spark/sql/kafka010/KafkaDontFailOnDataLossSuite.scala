@@ -27,6 +27,7 @@ import org.scalatest.time.SpanSugar._
 
 import org.apache.spark.SparkContext
 import org.apache.spark.sql.{DataFrame, Dataset, ForeachWriter}
+import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.streaming.{StreamTest, Trigger}
 import org.apache.spark.sql.test.{SharedSQLContext, TestSparkSession}
 
@@ -131,7 +132,7 @@ class KafkaDontFailOnDataLossSuite extends StreamTest with KafkaMissingOffsetsTe
     }
   }
 
-  test("failOnDataLoss=false should not return duplicated records: v1") {
+  test("failOnDataLoss=false should not return duplicated records: microbatch v1") {
     withSQLConf(
       "spark.sql.streaming.disabledV2MicroBatchReaders" ->
         classOf[KafkaSourceProvider].getCanonicalName) {
@@ -146,7 +147,7 @@ class KafkaDontFailOnDataLossSuite extends StreamTest with KafkaMissingOffsetsTe
     }
   }
 
-  test("failOnDataLoss=false should not return duplicated records: v2") {
+  test("failOnDataLoss=false should not return duplicated records: microbatch v2") {
     verifyMissingOffsetsDontCauseDuplicatedRecords(testStreamingQuery = true) { (df, table) =>
       val query = df.writeStream.format("memory").queryName(table).start()
       try {
@@ -176,9 +177,19 @@ class KafkaDontFailOnDataLossSuite extends StreamTest with KafkaMissingOffsetsTe
     }
   }
 
-  test("failOnDataLoss=false should not return duplicated records: batch") {
-    verifyMissingOffsetsDontCauseDuplicatedRecords(testStreamingQuery = false) { (df, table) =>
-      df.write.saveAsTable(table)
+  test("failOnDataLoss=false should not return duplicated records: batch v1") {
+    withSQLConf(SQLConf.USE_V1_SOURCE_READER_LIST.key -> "kafka") {
+      verifyMissingOffsetsDontCauseDuplicatedRecords(testStreamingQuery = false) { (df, table) =>
+        df.write.saveAsTable(table)
+      }
+    }
+  }
+
+  test("failOnDataLoss=false should not return duplicated records: batch v2") {
+    withSQLConf(SQLConf.USE_V1_SOURCE_READER_LIST.key -> "") {
+      verifyMissingOffsetsDontCauseDuplicatedRecords(testStreamingQuery = false) { (df, table) =>
+        df.write.saveAsTable(table)
+      }
     }
   }
 }

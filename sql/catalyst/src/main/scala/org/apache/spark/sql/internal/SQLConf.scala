@@ -1631,6 +1631,11 @@ object SQLConf {
     .internal()
     .intConf
     .createWithDefault(Int.MaxValue)
+
+  val V2_SESSION_CATALOG = buildConf("spark.sql.catalog.session")
+      .doc("Name of the default v2 catalog, used when a catalog is not identified in queries")
+      .stringConf
+      .createWithDefault("org.apache.spark.sql.execution.datasources.v2.V2SessionCatalog")
 }
 
 /**

@@ -31,7 +31,7 @@ import org.apache.spark.sql.catalyst.util.{fileToString, stringToFile}
 import org.apache.spark.sql.execution.HiveResult.hiveResultString
 import org.apache.spark.sql.execution.command.{DescribeColumnCommand, DescribeCommandBase}
 import org.apache.spark.sql.internal.SQLConf
-import org.apache.spark.sql.test.SharedSQLContext
+import org.apache.spark.sql.test.SharedSparkSession
 import org.apache.spark.sql.types.StructType
 
 /**
@@ -84,7 +84,7 @@ import org.apache.spark.sql.types.StructType
  *   ...
  * }}}
  */
-class SQLQueryTestSuite extends QueryTest with SharedSQLContext {
+class SQLQueryTestSuite extends QueryTest with SharedSparkSession {
 
   private val regenerateGoldenFiles: Boolean = System.getenv("SPARK_GENERATE_GOLDEN_FILES") == "1"
 

@@ -20,9 +20,9 @@ package org.apache.spark.sql.execution
 import org.apache.spark.sql._
 import org.apache.spark.sql.catalyst.TableIdentifier
 import org.apache.spark.sql.catalyst.analysis.NoSuchTableException
-import org.apache.spark.sql.test.{SharedSQLContext, SQLTestUtils}
+import org.apache.spark.sql.test.{SharedSparkSession, SQLTestUtils}
 
-class SimpleSQLViewSuite extends SQLViewSuite with SharedSQLContext
+class SimpleSQLViewSuite extends SQLViewSuite with SharedSparkSession
 
 /**
  * A suite for testing view related functionality.

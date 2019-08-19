@@ -18,10 +18,10 @@
 package org.apache.spark.sql
 
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.test.SharedSQLContext
+import org.apache.spark.sql.test.SharedSparkSession
 import org.apache.spark.sql.types._
 
-class JsonFunctionsSuite extends QueryTest with SharedSQLContext {
+class JsonFunctionsSuite extends QueryTest with SharedSparkSession {
   import testImplicits._
 
   test("function get_json_object") {

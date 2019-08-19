@@ -20,10 +20,10 @@ package org.apache.spark.sql
 import org.apache.spark.sql.catalyst.expressions.aggregate.PivotFirst
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.internal.SQLConf
-import org.apache.spark.sql.test.SharedSQLContext
+import org.apache.spark.sql.test.SharedSparkSession
 import org.apache.spark.sql.types._
 
-class DataFramePivotSuite extends QueryTest with SharedSQLContext {
+class DataFramePivotSuite extends QueryTest with SharedSparkSession {
   import testImplicits._
 
   test("pivot courses") {

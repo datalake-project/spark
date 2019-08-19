@@ -28,10 +28,10 @@ import org.scalatest.Matchers._
 import org.apache.spark.sql.catalyst.expressions.NamedExpression
 import org.apache.spark.sql.execution.ProjectExec
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.test.SharedSQLContext
+import org.apache.spark.sql.test.SharedSparkSession
 import org.apache.spark.sql.types._
 
-class ColumnExpressionSuite extends QueryTest with SharedSQLContext {
+class ColumnExpressionSuite extends QueryTest with SharedSparkSession {
   import testImplicits._
 
   private lazy val booleanData = {

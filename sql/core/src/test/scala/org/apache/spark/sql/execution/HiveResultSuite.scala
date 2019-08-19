@@ -17,10 +17,10 @@
 
 package org.apache.spark.sql.execution
 
-import org.apache.spark.SparkFunSuite
-import org.apache.spark.sql.test.{ExamplePoint, ExamplePointUDT}
+import org.apache.spark.sql.test.{ExamplePoint, ExamplePointUDT, SharedSparkSession}
 
-class HiveResultSuite extends SparkFunSuite {
+class HiveResultSuite extends SharedSparkSession {
+  import testImplicits._
 
   test("toHiveString correctly handles UDTs") {
     val point = new ExamplePoint(50.0, 50.0)

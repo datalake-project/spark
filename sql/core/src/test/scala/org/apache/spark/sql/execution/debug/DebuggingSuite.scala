@@ -17,12 +17,11 @@
 
 package org.apache.spark.sql.execution.debug
 
-import org.apache.spark.SparkFunSuite
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.test.SharedSQLContext
+import org.apache.spark.sql.test.SharedSparkSession
 import org.apache.spark.sql.test.SQLTestData.TestData
 
-class DebuggingSuite extends SparkFunSuite with SharedSQLContext {
+class DebuggingSuite extends SharedSparkSession {
 
   test("DataFrame.debug()") {
     testData.debug()

@@ -20,9 +20,9 @@ package org.apache.spark.sql
 import org.apache.spark.sql.catalyst.expressions.CreateNamedStruct
 import org.apache.spark.sql.catalyst.plans.logical.SerializeFromObject
 import org.apache.spark.sql.internal.SQLConf
-import org.apache.spark.sql.test.SharedSQLContext
+import org.apache.spark.sql.test.SharedSparkSession
 
-class DatasetOptimizationSuite extends QueryTest with SharedSQLContext {
+class DatasetOptimizationSuite extends QueryTest with SharedSparkSession {
   import testImplicits._
 
   test("SPARK-26619: Prune the unused serializers from SerializeFromObject") {

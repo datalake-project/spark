@@ -18,9 +18,9 @@
 package org.apache.spark.sql.execution.datasources
 
 import org.apache.spark.sql.{QueryTest, Row}
-import org.apache.spark.sql.test.SharedSQLContext
+import org.apache.spark.sql.test.SharedSparkSession
 
-class FileFormatWriterSuite extends QueryTest with SharedSQLContext {
+class FileFormatWriterSuite extends QueryTest with SharedSparkSession {
   import testImplicits._
 
   test("empty file should be skipped while write to file") {

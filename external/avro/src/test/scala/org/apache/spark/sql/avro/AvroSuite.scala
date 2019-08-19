@@ -37,10 +37,10 @@ import org.apache.spark.SparkException
 import org.apache.spark.sql._
 import org.apache.spark.sql.execution.datasources.DataSource
 import org.apache.spark.sql.internal.SQLConf
-import org.apache.spark.sql.test.{SharedSQLContext, SQLTestUtils}
+import org.apache.spark.sql.test.SharedSparkSession
 import org.apache.spark.sql.types._
 
-class AvroSuite extends QueryTest with SharedSQLContext with SQLTestUtils {
+class AvroSuite extends QueryTest with SharedSparkSession {
   import testImplicits._
 
   val episodesAvro = testFile("episodes.avro")

@@ -21,9 +21,7 @@ import org.apache.spark.sql.catalyst.encoders.ExpressionEncoder
 import org.apache.spark.sql.expressions.Aggregator
 import org.apache.spark.sql.expressions.scalalang.typed
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.test.SharedSQLContext
-import org.apache.spark.sql.types.StringType
-
+import org.apache.spark.sql.test.SharedSparkSession
 
 object ComplexResultAgg extends Aggregator[(String, Int), (Long, Long), (Long, Long)] {
   override def zero: (Long, Long) = (0, 0)
@@ -183,7 +181,7 @@ case class OptionBooleanAggregator(colName: String)
   def OptionalBoolEncoder: Encoder[Option[Boolean]] = ExpressionEncoder()
 }
 
-class DatasetAggregatorSuite extends QueryTest with SharedSQLContext {
+class DatasetAggregatorSuite extends QueryTest with SharedSparkSession {
   import testImplicits._
 
   private implicit val ordering = Ordering.by((c: AggData) => c.a -> c.b)

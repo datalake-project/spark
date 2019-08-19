@@ -33,7 +33,7 @@ import org.scalatest.BeforeAndAfterAll
 import org.apache.spark.SPARK_VERSION_SHORT
 import org.apache.spark.sql.{Row, SPARK_VERSION_METADATA_KEY}
 import org.apache.spark.sql.internal.SQLConf
-import org.apache.spark.sql.test.SharedSQLContext
+import org.apache.spark.sql.test.SharedSparkSession
 import org.apache.spark.util.Utils
 
 case class OrcData(intField: Int, stringField: String)
@@ -263,7 +263,7 @@ abstract class OrcSuite extends OrcTest with BeforeAndAfterAll {
   }
 }
 
-class OrcSourceSuite extends OrcSuite with SharedSQLContext {
+class OrcSourceSuite extends OrcSuite with SharedSparkSession {
 
   protected override def beforeAll(): Unit = {
     super.beforeAll()

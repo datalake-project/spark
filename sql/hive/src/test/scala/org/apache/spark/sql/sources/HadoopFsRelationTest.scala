@@ -814,7 +814,7 @@ abstract class HadoopFsRelationTest extends QueryTest with SQLTestUtils with Tes
         assert(preferredLocations.distinct.length == 2)
       }
 
-      withSQLConf(SQLConf.USE_V1_SOURCE_READER_LIST.key -> dataSourceName) {
+      withSQLConf(SQLConf.USE_V1_SOURCE_LIST.key -> dataSourceName) {
         checkLocality()
 
         withSQLConf(SQLConf.PARALLEL_PARTITION_DISCOVERY_THRESHOLD.key -> "0") {

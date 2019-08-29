@@ -19,6 +19,7 @@ package org.apache.spark.sql.sources.v2
 
 import org.apache.spark.sql.{DataFrame, SaveMode}
 import org.apache.spark.sql.catalog.v2.{Identifier, TableCatalog}
+import org.apache.spark.sql.connector.InMemoryTable
 
 class DataSourceV2SQLSessionCatalogSuite
   extends InsertIntoTests(supportsDynamicOverwrite = true, includeSQLOnlyTests = true)

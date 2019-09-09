@@ -1630,9 +1630,12 @@ object SQLConf {
       .createWithDefault(Int.MaxValue)
 
   val V2_SESSION_CATALOG = buildConf("spark.sql.catalog.session")
-      .doc("Name of the default v2 catalog, used when a catalog is not identified in queries")
+      .doc("A catalog implementation that will be used in place of the Spark built-in session " +
+        "catalog for v2 operations. The implementation may extend `CatalogExtension` to be " +
+        "passed the Spark built-in session catalog, so that it may delegate calls to the " +
+        "built-in session catalog.")
       .stringConf
-      .createWithDefault("org.apache.spark.sql.execution.datasources.v2.V2SessionCatalog")
+      .createOptional
 }
 
 /**

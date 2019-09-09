@@ -59,14 +59,12 @@ class PlanResolutionSuite extends AnalysisTest {
       invocation.getArgument[String](0) match {
         case "testcat" =>
           testCat
-        case "session" =>
-          v2SessionCatalog
         case name =>
           throw new CatalogNotFoundException(s"No such catalog: $name")
       }
     })
     when(manager.defaultCatalog).thenReturn(Some(testCat))
-    when(manager.v2SessionCatalog).thenCallRealMethod()
+    when(manager.v2SessionCatalog).thenReturn(v2SessionCatalog)
     manager
   }
 
@@ -76,14 +74,12 @@ class PlanResolutionSuite extends AnalysisTest {
       invocation.getArgument[String](0) match {
         case "testcat" =>
           testCat
-        case "session" =>
-          v2SessionCatalog
         case name =>
           throw new CatalogNotFoundException(s"No such catalog: $name")
       }
     })
     when(manager.defaultCatalog).thenReturn(None)
-    when(manager.v2SessionCatalog).thenCallRealMethod()
+    when(manager.v2SessionCatalog).thenReturn(v2SessionCatalog)
     manager
   }
 

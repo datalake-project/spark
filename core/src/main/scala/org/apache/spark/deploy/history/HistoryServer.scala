@@ -300,6 +300,7 @@ object HistoryServer extends Logging {
 
     val server = new HistoryServer(conf, provider, securityManager, port)
     server.bind()
+    provider.start()
 
     ShutdownHookManager.addShutdownHook { () => server.stop() }
 

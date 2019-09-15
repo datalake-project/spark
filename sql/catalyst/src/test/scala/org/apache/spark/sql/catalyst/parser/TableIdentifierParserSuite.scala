@@ -440,6 +440,7 @@ class TableIdentifierParserSuite extends SparkFunSuite with SQLHelper {
     "month",
     "months",
     "msck",
+    "namespaces",
     "natural",
     "no",
     "not",

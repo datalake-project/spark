@@ -215,7 +215,7 @@ statement
     | SET ROLE .*?                                                     #failNativeCommand
     | SET .*?                                                          #setConfiguration
     | RESET                                                            #resetConfiguration
-    | DELETE FROM multipartIdentifier tableAlias whereClause           #deleteFromTable
+    | DELETE FROM multipartIdentifier tableAlias whereClause?          #deleteFromTable
     | UPDATE multipartIdentifier tableAlias setClause whereClause?     #updateTable
     | unsupportedHiveNativeCommands .*?                                #failNativeCommand
     ;

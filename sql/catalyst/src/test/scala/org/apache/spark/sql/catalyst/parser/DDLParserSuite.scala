@@ -807,6 +807,30 @@ class DDLParserSuite extends AnalysisTest {
     assert(exc.getMessage.contains("Columns aliases is not allowed in UPDATE."))
   }
 
+  test("delete from table: delete all") {
+    parseCompare("DELETE FROM testcat.ns1.ns2.tbl",
+      DeleteFromStatement(
+        Seq("testcat", "ns1", "ns2", "tbl"),
+        None,
+        None))
+  }
+
+  test("delete from table: with alias and where clause") {
+    parseCompare("DELETE FROM testcat.ns1.ns2.tbl AS t WHERE t.a = 2",
+      DeleteFromStatement(
+        Seq("testcat", "ns1", "ns2", "tbl"),
+        Some("t"),
+        Some(EqualTo(UnresolvedAttribute("t.a"), Literal(2)))))
+  }
+
+  test("delete from table: columns aliases is not allowed") {
+    val exc = intercept[ParseException] {
+      parsePlan("DELETE FROM testcat.ns1.ns2.tbl AS t(a,b,c,d) WHERE d = 2")
+    }
+
+    assert(exc.getMessage.contains("Columns aliases is not allowed in DELETE."))
+  }
+
   test("show tables") {
     comparePlans(
       parsePlan("SHOW TABLES"),

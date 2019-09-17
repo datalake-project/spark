@@ -252,16 +252,17 @@ object DataSourceV2Strategy extends Strategy with PredicateHelper {
         r.table.asWritable, writeOptions.asOptions, planLater(query)) :: Nil
 
     case DeleteFromTable(r: DataSourceV2Relation, condition) =>
-      if (SubqueryExpression.hasSubquery(condition)) {
+      if (condition.exists(SubqueryExpression.hasSubquery)) {
         throw new AnalysisException(
           s"Delete by condition with subquery is not supported: $condition")
       }
       // fail if any filter cannot be converted. correctness depends on removing all matching data.
-      val filters = splitConjunctivePredicates(condition).map {
-        f => DataSourceStrategy.translateFilter(f).getOrElse(
-          throw new AnalysisException(s"Exec delete failed:" +
-              s" cannot translate expression to source filter: $f"))
-      }.toArray
+      val filters = DataSourceStrategy.normalizeFilters(condition.toSeq, r.output)
+          .flatMap(splitConjunctivePredicates(_).map {
+            f => DataSourceStrategy.translateFilter(f).getOrElse(
+              throw new AnalysisException(s"Exec update failed:" +
+                  s" cannot translate expression to source filter: $f"))
+          }).toArray
       DeleteFromTableExec(r.table.asDeletable, filters) :: Nil
 
     case WriteToContinuousDataSource(writer, query) =>

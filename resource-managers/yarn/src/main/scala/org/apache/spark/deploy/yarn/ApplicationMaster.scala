@@ -550,7 +550,11 @@ private[spark] class ApplicationMaster(args: ApplicationMasterArguments) extends
             e.getMessage)
         case e: Throwable =>
           failureCount += 1
-          if (!NonFatal(e) || failureCount >= reporterMaxFailures) {
+          if (!NonFatal(e)) {
+            finish(FinalApplicationStatus.FAILED,
+              ApplicationMaster.EXIT_REPORTER_FAILURE,
+              "Fatal exception: " + StringUtils.stringifyException(e))
+          } else if (failureCount >= reporterMaxFailures) {
             finish(FinalApplicationStatus.FAILED,
               ApplicationMaster.EXIT_REPORTER_FAILURE, "Exception was thrown " +
                 s"$failureCount time(s) from Reporter thread.")

@@ -19,7 +19,6 @@ package org.apache.spark.sql.hive
 
 import org.apache.spark.annotation.{Experimental, Unstable}
 import org.apache.spark.sql._
-import org.apache.spark.sql.catalog.v2.CatalogPlugin
 import org.apache.spark.sql.catalyst.analysis.Analyzer
 import org.apache.spark.sql.catalyst.catalog.ExternalCatalogWithListener
 import org.apache.spark.sql.catalyst.plans.logical.LogicalPlan
@@ -68,7 +67,7 @@ class HiveSessionStateBuilder(session: SparkSession, parentState: Option[Session
   /**
    * A logical query plan `Analyzer` with rules specific to Hive.
    */
-  override protected def analyzer: Analyzer = new Analyzer(catalog, v2SessionCatalog, conf) {
+  override protected def analyzer: Analyzer = new Analyzer(catalogManager, conf) {
     override val extendedResolutionRules: Seq[Rule[LogicalPlan]] =
       new ResolveHiveSerdeTable(session) +:
         new FindDataSourceTable(session) +:

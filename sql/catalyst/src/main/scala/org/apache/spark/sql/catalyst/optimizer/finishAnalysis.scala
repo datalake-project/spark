@@ -19,11 +19,11 @@ package org.apache.spark.sql.catalyst.optimizer
 
 import scala.collection.mutable
 
-import org.apache.spark.sql.catalyst.catalog.SessionCatalog
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.plans.logical._
 import org.apache.spark.sql.catalyst.rules._
 import org.apache.spark.sql.catalyst.util.DateTimeUtils
+import org.apache.spark.sql.connector.catalog.CatalogManager
 import org.apache.spark.sql.types._
 
 
@@ -63,11 +63,14 @@ object ComputeCurrentTime extends Rule[LogicalPlan] {
 
 
 /** Replaces the expression of CurrentDatabase with the current database name. */
-case class GetCurrentDatabase(sessionCatalog: SessionCatalog) extends Rule[LogicalPlan] {
+case class GetCurrentDatabase(catalogManager: CatalogManager) extends Rule[LogicalPlan] {
   def apply(plan: LogicalPlan): LogicalPlan = {
+    import org.apache.spark.sql.connector.catalog.CatalogV2Implicits._
+    val currentNamespace = catalogManager.currentNamespace.quoted
+
     plan transformAllExpressions {
       case CurrentDatabase() =>
-        Literal.create(sessionCatalog.getCurrentDatabase, StringType)
+        Literal.create(currentNamespace, StringType)
     }
   }
 }

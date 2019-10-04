@@ -23,6 +23,7 @@ import org.apache.spark.sql._
 import org.apache.spark.sql.catalyst.analysis.{CannotReplaceMissingTableException, NoSuchDatabaseException, NoSuchTableException, TableAlreadyExistsException}
 import org.apache.spark.sql.connector.catalog._
 import org.apache.spark.sql.internal.SQLConf
+import org.apache.spark.sql.sources.SimpleScanSource
 import org.apache.spark.sql.types.{BooleanType, LongType, StringType, StructType}
 import org.apache.spark.sql.util.CaseInsensitiveStringMap
 
@@ -783,7 +784,8 @@ class DataSourceV2SQLSuite
       sql("SHOW NAMESPACES")
     }
 
-    assert(exception.getMessage.contains("No default v2 catalog is set"))
+    assert(exception.getMessage.contains(
+      "SHOW NAMESPACES is not supported with the session catalog"))
   }
 
   test("ShowNamespaces: default v2 catalog doesn't support namespace") {
@@ -811,12 +813,13 @@ class DataSourceV2SQLSuite
     assert(exception.getMessage.contains("does not support namespaces"))
   }
 
-  test("ShowNamespaces: no v2 catalog is available") {
+  test("ShowNamespaces: session catalog") {
     val exception = intercept[AnalysisException] {
       sql("SHOW NAMESPACES in dummy")
     }
 
-    assert(exception.getMessage.contains("No v2 catalog is available"))
+    assert(exception.getMessage.contains(
+      "SHOW NAMESPACES is not supported with the session catalog"))
   }
 
   private def testShowNamespaces(
@@ -1052,6 +1055,13 @@ class DataSourceV2SQLSuite
     }
   }
 
+  test("REPLACE TABLE: v1 table") {
+    val e = intercept[AnalysisException] {
+      sql(s"CREATE OR REPLACE TABLE tbl (a int) USING ${classOf[SimpleScanSource].getName}")
+    }
+    assert(e.message.contains("REPLACE TABLE is only supported with v2 tables"))
+  }
+
   test("DeleteFrom: basic") {
     val t = "testcat.ns1.ns2.tbl"
     withTable(t) {
@@ -1106,7 +1116,7 @@ class DataSourceV2SQLSuite
            |(4L, 'Frank', 33, 3)
          """.stripMargin)
     }
-    val errMsg = "Update table is not supported temporarily"
+    val errMsg = "UPDATE TABLE is not supported temporarily"
     testCreateAnalysisError(
       s"UPDATE $t SET name='Robert', age=32",
       errMsg

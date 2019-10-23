@@ -202,7 +202,7 @@ statement
     | (DESC | DESCRIBE) TABLE? option=(EXTENDED | FORMATTED)?
         multipartIdentifier partitionSpec? describeColName?            #describeTable
     | (DESC | DESCRIBE) QUERY? queryToDesc                             #describeQuery
-    | REFRESH TABLE tableIdentifier                                    #refreshTable
+    | REFRESH TABLE multipartIdentifier                                #refreshTable
     | REFRESH (STRING | .*?)                                           #refreshResource
     | CACHE LAZY? TABLE tableIdentifier (AS? query)?                   #cacheTable
     | UNCACHE TABLE (IF EXISTS)? tableIdentifier                       #uncacheTable

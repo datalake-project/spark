@@ -246,14 +246,16 @@ final class DataFrameWriter[T] private[sql](ds: Dataset[T]) {
     if (classOf[DataSourceV2].isAssignableFrom(cls)) {
       val source = cls.newInstance().asInstanceOf[DataSourceV2]
       source match {
-        case ws: WriteSupport =>
+        case provider: BatchWriteSupportProvider =>
           val sessionOptions = DataSourceV2Utils.extractSessionConfigs(
             source,
             df.sparkSession.sessionState.conf)
           val options = sessionOptions ++ extraOptions
 
-          val writer = ws.createWriter(
-            UUID.randomUUID.toString, df.logicalPlan.output.toStructType, mode,
+          val writer = provider.createBatchWriteSupport(
+            UUID.randomUUID().toString,
+            df.logicalPlan.output.toStructType,
+            mode,
             new DataSourceOptions(options.asJava))
 
           if (writer.isPresent) {

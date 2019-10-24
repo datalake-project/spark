@@ -21,7 +21,7 @@ import java.util.Locale
 
 import scala.collection.JavaConverters._
 
-import org.apache.spark.annotation.{InterfaceStability, Since}
+import org.apache.spark.annotation.InterfaceStability
 import org.apache.spark.api.java.function.VoidFunction2
 import org.apache.spark.sql._
 import org.apache.spark.sql.catalyst.streaming.InternalOutputModes
@@ -31,7 +31,7 @@ import org.apache.spark.sql.execution.datasources.v2.DataSourceV2Utils
 import org.apache.spark.sql.execution.streaming._
 import org.apache.spark.sql.execution.streaming.continuous.ContinuousTrigger
 import org.apache.spark.sql.execution.streaming.sources._
-import org.apache.spark.sql.sources.v2.StreamWriteSupport
+import org.apache.spark.sql.sources.v2.StreamingWriteSupportProvider
 
 /**
  * Interface used to write a streaming `Dataset` to external storage systems (e.g. file systems,
@@ -278,7 +278,7 @@ final class DataStreamWriter[T] private[sql](ds: Dataset[T]) {
       query
     } else if (source == "foreach") {
       assertNotPartitioned("foreach")
-      val sink = ForeachWriterProvider[T](foreachWriter, ds.exprEnc)
+      val sink = ForeachWriteSupportProvider[T](foreachWriter, ds.exprEnc)
       df.sparkSession.sessionState.streamingQueryManager.startQuery(
         extraOptions.get("queryName"),
         extraOptions.get("checkpointLocation"),
@@ -308,7 +308,8 @@ final class DataStreamWriter[T] private[sql](ds: Dataset[T]) {
       val disabledSources = df.sparkSession.sqlContext.conf.disabledV2StreamingWriters.split(",")
       var options = extraOptions.toMap
       val sink = ds.newInstance() match {
-        case w: StreamWriteSupport if !disabledSources.contains(w.getClass.getCanonicalName) =>
+        case w: StreamingWriteSupportProvider
+            if !disabledSources.contains(w.getClass.getCanonicalName) =>
           val sessionOptions = DataSourceV2Utils.extractSessionConfigs(
             w, df.sparkSession.sessionState.conf)
           options = sessionOptions ++ extraOptions

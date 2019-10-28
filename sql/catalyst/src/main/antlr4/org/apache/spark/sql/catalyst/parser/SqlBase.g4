@@ -89,8 +89,8 @@ statement
          (WITH (DBPROPERTIES | PROPERTIES) tablePropertyList))*        #createNamespace
     | ALTER database db=errorCapturingIdentifier
         SET DBPROPERTIES tablePropertyList                             #setDatabaseProperties
-    | DROP database (IF EXISTS)? db=errorCapturingIdentifier
-        (RESTRICT | CASCADE)?                                          #dropDatabase
+    | DROP (database | NAMESPACE) (IF EXISTS)? multipartIdentifier
+              (RESTRICT | CASCADE)?                                    #dropNamespace
     | SHOW NAMESPACES ((FROM | IN) multipartIdentifier)?
         (LIKE? pattern=STRING)?                                        #showNamespaces
     | createTableHeader ('(' colTypeList ')')? tableProvider

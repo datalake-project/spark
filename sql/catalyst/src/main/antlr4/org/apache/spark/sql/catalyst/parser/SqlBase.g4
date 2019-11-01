@@ -158,10 +158,8 @@ statement
         partitionSpec+                                                 #addTablePartition
     | ALTER TABLE multipartIdentifier
         from=partitionSpec RENAME TO to=partitionSpec                  #renameTablePartition
-    | ALTER TABLE tableIdentifier
+    | ALTER (TABLE | VIEW) multipartIdentifier
         DROP (IF EXISTS)? partitionSpec (',' partitionSpec)* PURGE?    #dropTablePartitions
-    | ALTER VIEW tableIdentifier
-        DROP (IF EXISTS)? partitionSpec (',' partitionSpec)*           #dropTablePartitions
     | ALTER TABLE multipartIdentifier
         (partitionSpec)? SET locationSpec                              #setTableLocation
     | ALTER TABLE tableIdentifier RECOVER PARTITIONS                   #recoverPartitions

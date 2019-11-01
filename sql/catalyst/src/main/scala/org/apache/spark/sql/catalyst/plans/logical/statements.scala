@@ -183,6 +183,14 @@ case class AlterTableSetLocationStatement(
     location: String) extends ParsedStatement
 
 /**
+ * ALTER TABLE ... RENAME PARTITION command, as parsed from SQL.
+ */
+case class AlterTableRenamePartitionStatement(
+    tableName: Seq[String],
+    from: TablePartitionSpec,
+    to: TablePartitionSpec) extends ParsedStatement
+
+/**
  * ALTER VIEW ... SET TBLPROPERTIES command, as parsed from SQL.
  */
 case class AlterViewSetPropertiesStatement(

@@ -183,6 +183,14 @@ case class AlterTableSetLocationStatement(
     location: String) extends ParsedStatement
 
 /**
+ * ALTER TABLE ... ADD PARTITION command, as parsed from SQL
+ */
+case class AlterTableAddPartitionStatement(
+    tableName: Seq[String],
+    partitionSpecsAndLocs: Seq[(TablePartitionSpec, Option[String])],
+    ifNotExists: Boolean) extends ParsedStatement
+
+/**
  * ALTER TABLE ... RENAME PARTITION command, as parsed from SQL.
  */
 case class AlterTableRenamePartitionStatement(

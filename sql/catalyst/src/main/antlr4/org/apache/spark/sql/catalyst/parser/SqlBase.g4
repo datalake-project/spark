@@ -130,20 +130,22 @@ statement
     | ALTER TABLE multipartIdentifier
         ADD (COLUMN | COLUMNS)
         '(' columns=qualifiedColTypeWithPositionList ')'               #addTableColumns
+    | ALTER TABLE table=multipartIdentifier
+        RENAME COLUMN
+        from=multipartIdentifier TO to=errorCapturingIdentifier        #renameTableColumn
     | ALTER TABLE multipartIdentifier
-        RENAME COLUMN from=qualifiedName TO to=identifier              #renameTableColumn
+        DROP (COLUMN | COLUMNS)
+        '(' columns=multipartIdentifierList ')'                        #dropTableColumns
     | ALTER TABLE multipartIdentifier
-        DROP (COLUMN | COLUMNS) '(' columns=qualifiedNameList ')'      #dropTableColumns
-    | ALTER TABLE multipartIdentifier
-        DROP (COLUMN | COLUMNS) columns=qualifiedNameList              #dropTableColumns
+        DROP (COLUMN | COLUMNS) columns=multipartIdentifierList        #dropTableColumns
     | ALTER (TABLE | VIEW) from=tableIdentifier
         RENAME TO to=tableIdentifier                                   #renameTable
     | ALTER (TABLE | VIEW) multipartIdentifier
         SET TBLPROPERTIES tablePropertyList                            #setTableProperties
     | ALTER (TABLE | VIEW) multipartIdentifier
         UNSET TBLPROPERTIES (IF EXISTS)? tablePropertyList             #unsetTableProperties
-    | ALTER TABLE multipartIdentifier
-        (ALTER | CHANGE) COLUMN? multipartIdentifier
+    | ALTER TABLE table=multipartIdentifier
+        (ALTER | CHANGE) COLUMN? column=multipartIdentifier
         (TYPE dataType)? (COMMENT comment=STRING)? colPosition?        #alterTableColumn
     | ALTER TABLE multipartIdentifier (partitionSpec)?
         SET SERDE STRING (WITH SERDEPROPERTIES tablePropertyList)?     #setTableSerDe
@@ -172,9 +174,9 @@ statement
         (OPTIONS tablePropertyList)?                                   #createTempViewUsing
     | ALTER VIEW tableIdentifier AS? query                             #alterViewQuery
     | CREATE (OR REPLACE)? TEMPORARY? FUNCTION (IF NOT EXISTS)?
-        qualifiedName AS className=STRING
+        multipartIdentifier AS className=STRING
         (USING resource (',' resource)*)?                              #createFunction
-    | DROP TEMPORARY? FUNCTION (IF EXISTS)? qualifiedName              #dropFunction
+    | DROP TEMPORARY? FUNCTION (IF EXISTS)? multipartIdentifier        #dropFunction
     | EXPLAIN (LOGICAL | FORMATTED | EXTENDED | CODEGEN | COST)?
         statement                                                      #explain
     | SHOW TABLES ((FROM | IN) multipartIdentifier)?
@@ -188,7 +190,7 @@ statement
         ((FROM | IN) db=errorCapturingIdentifier)?                     #showColumns
     | SHOW PARTITIONS multipartIdentifier partitionSpec?               #showPartitions
     | SHOW identifier? FUNCTIONS
-        (LIKE? (qualifiedName | pattern=STRING))?                      #showFunctions
+        (LIKE? (multipartIdentifier | pattern=STRING))?                #showFunctions
     | SHOW CREATE TABLE multipartIdentifier                            #showCreateTable
     | SHOW CURRENT NAMESPACE                                           #showCurrentNamespace
     | (DESC | DESCRIBE) FUNCTION EXTENDED? describeFuncName            #describeFunction
@@ -340,7 +342,7 @@ namedQuery
     ;
 
 tableProvider
-    : USING qualifiedName
+    : USING multipartIdentifier
     ;
 
 tablePropertyList
@@ -637,6 +639,10 @@ multipartIdentifier
     : parts+=errorCapturingIdentifier ('.' parts+=errorCapturingIdentifier)*
     ;
 
+multipartIdentifierList
+    : multipartIdentifier (',' multipartIdentifier)*
+    ;
+
 tableIdentifier
     : (db=errorCapturingIdentifier '.')? table=errorCapturingIdentifier
     ;
@@ -787,7 +793,7 @@ intervalUnit
     ;
 
 colPosition
-    : FIRST | AFTER qualifiedName
+    : FIRST | AFTER multipartIdentifier
     ;
 
 dataType
@@ -802,7 +808,7 @@ qualifiedColTypeWithPositionList
     ;
 
 qualifiedColTypeWithPosition
-    : name=qualifiedName dataType (COMMENT comment=STRING)? colPosition?
+    : name=multipartIdentifier dataType (COMMENT comment=STRING)? colPosition?
     ;
 
 colTypeList

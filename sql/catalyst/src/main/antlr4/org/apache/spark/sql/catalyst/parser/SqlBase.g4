@@ -214,6 +214,12 @@ statement
     | RESET                                                            #resetConfiguration
     | DELETE FROM multipartIdentifier tableAlias whereClause?          #deleteFromTable
     | UPDATE multipartIdentifier tableAlias setClause whereClause?     #updateTable
+    | MERGE INTO target=multipartIdentifier targetAlias=tableAlias
+        USING (source=multipartIdentifier |
+          '(' sourceQuery=query')') sourceAlias=tableAlias
+        ON mergeCondition=booleanExpression
+        matchedClause*
+        notMatchedClause*                                              #mergeIntoTable
     | unsupportedHiveNativeCommands .*?                                #failNativeCommand
     ;
 
@@ -482,10 +488,33 @@ selectClause
     ;
 
 setClause
-    : SET assign (',' assign)*
+    : SET assignmentList
     ;
 
-assign
+matchedClause
+    : WHEN MATCHED (AND matchedCond=booleanExpression)? THEN matchedAction
+    ;
+notMatchedClause
+    : WHEN NOT MATCHED (AND notMatchedCond=booleanExpression)? THEN notMatchedAction
+    ;
+
+matchedAction
+    : DELETE
+    | UPDATE SET ASTERISK
+    | UPDATE SET assignmentList
+    ;
+
+notMatchedAction
+    : INSERT ASTERISK
+    | INSERT '(' columns=multipartIdentifierList ')'
+        VALUES '(' expression (',' expression)* ')'
+    ;
+
+assignmentList
+    : assignment (',' assignment)*
+    ;
+
+assignment
     : key=multipartIdentifier EQ value=expression
     ;
 
@@ -633,6 +662,10 @@ rowFormat
       (MAP KEYS TERMINATED BY keysTerminatedBy=STRING)?
       (LINES TERMINATED BY linesSeparatedBy=STRING)?
       (NULL DEFINED AS nullDefinedAs=STRING)?                                       #rowFormatDelimited
+    ;
+
+multipartIdentifierList
+    : multipartIdentifier (',' multipartIdentifier)*
     ;
 
 multipartIdentifier
@@ -1012,6 +1045,8 @@ ansiNonReserved
     | LOGICAL
     | MACRO
     | MAP
+    | MATCHED
+    | MERGE
     | MICROSECOND
     | MICROSECONDS
     | MILLISECOND
@@ -1255,6 +1290,8 @@ nonReserved
     | LOGICAL
     | MACRO
     | MAP
+    | MATCHED
+    | MERGE
     | MICROSECOND
     | MICROSECONDS
     | MILLISECOND
@@ -1510,6 +1547,8 @@ LOCKS: 'LOCKS';
 LOGICAL: 'LOGICAL';
 MACRO: 'MACRO';
 MAP: 'MAP';
+MATCHED: 'MATCHED';
+MERGE: 'MERGE';
 MICROSECOND: 'MICROSECOND';
 MICROSECONDS: 'MICROSECONDS';
 MILLISECOND: 'MILLISECOND';

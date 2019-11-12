@@ -192,7 +192,8 @@ case class RelationConversions(
   override def apply(plan: LogicalPlan): LogicalPlan = {
     plan resolveOperators {
       // Write path
-      case InsertIntoStatement(r: HiveTableRelation, partition, query, overwrite, ifPartitionNotExists)
+      case InsertIntoStatement(r: HiveTableRelation, partition, query, overwrite,
+        ifPartitionNotExists)
         // Inserting into partitioned table is not supported in Parquet/Orc data source (yet).
           if query.resolved && DDLUtils.isHiveTable(r.tableMeta) &&
             !r.isPartitioned && isConvertible(r) =>

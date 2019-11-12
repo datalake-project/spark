@@ -66,6 +66,10 @@ case class ColumnarToRowExec(child: SparkPlan) extends UnaryExecNode with Codege
 
   override def outputOrdering: Seq[SortOrder] = child.outputOrdering
 
+  // `ColumnarToRowExec` processes the input RDD directly, which is kind of a leaf node in the
+  // codegen stage and needs to do the limit check.
+  protected override def canCheckLimitNotReached: Boolean = true
+
   override lazy val metrics: Map[String, SQLMetric] = Map(
     "numOutputRows" -> SQLMetrics.createMetric(sparkContext, "number of output rows"),
     "numInputBatches" -> SQLMetrics.createMetric(sparkContext, "number of input batches")

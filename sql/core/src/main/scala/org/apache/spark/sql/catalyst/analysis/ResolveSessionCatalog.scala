@@ -401,6 +401,11 @@ class ResolveSessionCatalog(
         v1TableName.asTableIdentifier,
         originalText,
         query)
+
+    case ShowTablePropertiesStatement(SessionCatalog(_, tableName), propertyKey) =>
+      ShowTablePropertiesCommand(
+        tableName.asTableIdentifier,
+        propertyKey)
   }
 
   private def parseV1Table(tableName: Seq[String], sql: String): Seq[String] = {

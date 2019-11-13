@@ -1612,8 +1612,20 @@ object SQLConf {
       .intConf
       .createWithDefault(25)
 
-  val DEFAULT_V2_CATALOG = buildConf("spark.sql.default.catalog")
-      .doc("Name of the default v2 catalog, used when a catalog is not identified in queries")
+  val DEFAULT_CATALOG = buildConf("spark.sql.defaultCatalog")
+    .doc("Name of the default catalog. This will be the current catalog if users have not " +
+      "explicitly set the current catalog yet.")
+    .stringConf
+    .createWithDefault(SESSION_CATALOG_NAME)
+
+  val V2_SESSION_CATALOG_IMPLEMENTATION =
+    buildConf(s"spark.sql.catalog.$SESSION_CATALOG_NAME")
+      .doc("A catalog implementation that will be used as the v2 interface to Spark's built-in " +
+        s"v1 catalog: $SESSION_CATALOG_NAME. This catalog shares its identifier namespace with " +
+        s"the $SESSION_CATALOG_NAME and must be consistent with it; for example, if a table can " +
+        s"be loaded by the $SESSION_CATALOG_NAME, this catalog must also return the table " +
+        s"metadata. To delegate operations to the $SESSION_CATALOG_NAME, implementations can " +
+        "extend 'CatalogExtension'.")
       .stringConf
       .createOptional
 
@@ -1629,17 +1641,6 @@ object SQLConf {
       .internal()
       .intConf
       .createWithDefault(Int.MaxValue)
-
-  val V2_SESSION_CATALOG_IMPLEMENTATION =
-    buildConf(s"spark.sql.catalog.$SESSION_CATALOG_NAME")
-      .doc("A catalog implementation that will be used as the v2 interface to Spark's built-in " +
-        s"v1 catalog: $SESSION_CATALOG_NAME. This catalog shares its identifier namespace with " +
-        s"the $SESSION_CATALOG_NAME and must be consistent with it; for example, if a table can " +
-        s"be loaded by the $SESSION_CATALOG_NAME, this catalog must also return the table " +
-        s"metadata. To delegate operations to the $SESSION_CATALOG_NAME, implementations can " +
-        "extend 'CatalogExtension'.")
-      .stringConf
-      .createOptional
 }
 
 /**
@@ -2060,8 +2061,6 @@ class SQLConf extends Serializable with Logging {
   def setOpsPrecedenceEnforced: Boolean = getConf(SQLConf.LEGACY_SETOPS_PRECEDENCE_ENABLED)
 
   def maxToStringFields: Int = getConf(SQLConf.MAX_TO_STRING_FIELDS)
-
-  def defaultV2Catalog: Option[String] = getConf(DEFAULT_V2_CATALOG)
 
   /** ********************** SQLConf functionality methods ************ */
 

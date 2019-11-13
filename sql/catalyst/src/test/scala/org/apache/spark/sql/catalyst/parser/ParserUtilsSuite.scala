@@ -40,7 +40,7 @@ class ParserUtilsSuite extends SparkFunSuite {
   }
 
   val showDbsContext = buildContext("show databases like 'identifier_with_wildcards'") { parser =>
-    parser.statement().asInstanceOf[ShowNamespacesContext]
+    parser.statement().asInstanceOf[ShowDatabasesContext]
   }
 
   val createDbContext = buildContext(

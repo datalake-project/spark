@@ -91,8 +91,7 @@ statement
         SET DBPROPERTIES tablePropertyList                             #setDatabaseProperties
     | DROP (database | NAMESPACE) (IF EXISTS)? multipartIdentifier
               (RESTRICT | CASCADE)?                                    #dropNamespace
-    | SHOW NAMESPACES ((FROM | IN) multipartIdentifier)?
-        (LIKE? pattern=STRING)?                                        #showNamespaces
+
     | createTableHeader ('(' colTypeList ')')? tableProvider
         ((OPTIONS options=tablePropertyList) |
         (PARTITIONED BY partitioning=transformList) |
@@ -183,7 +182,8 @@ statement
         (LIKE? pattern=STRING)?                                        #showTables
     | SHOW TABLE EXTENDED ((FROM | IN) db=errorCapturingIdentifier)?
         LIKE pattern=STRING partitionSpec?                             #showTable
-    | SHOW DATABASES (LIKE? pattern=STRING)?                           #showDatabases
+    | SHOW (DATABASES | NAMESPACES) ((FROM | IN) multipartIdentifier)?
+            (LIKE? pattern=STRING)?                                    #showNamespaces
     | SHOW TBLPROPERTIES table=tableIdentifier
         ('(' key=tablePropertyKey ')')?                                #showTblProperties
     | SHOW COLUMNS (FROM | IN) tableIdentifier

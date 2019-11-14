@@ -363,8 +363,7 @@ trait CheckAnalysis extends PredicateHelper {
                 // output, so we should cast the attribute to the dataType of the view output
                 // attribute. Will throw an AnalysisException if the cast can't be performed or
                 // might truncate.
-                if (Cast.canUpCast(originAttr.dataType, attr.dataType) ||
-                  !Cast.canCast(originAttr.dataType, attr.dataType)) {
+                if (!Cast.canUpCast(originAttr.dataType, attr.dataType)) {
                   throw new AnalysisException(s"Cannot up cast ${originAttr.sql} from " +
                     s"${originAttr.dataType.catalogString} to ${attr.dataType.catalogString} " +
                     "as it may truncate\n")

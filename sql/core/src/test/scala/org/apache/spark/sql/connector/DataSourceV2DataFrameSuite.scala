@@ -136,7 +136,7 @@ class DataSourceV2DataFrameSuite
       override def onSuccess(funcName: String, qe: QueryExecution, durationNs: Long): Unit = {
         plan = qe.analyzed
       }
-      override def onFailure(funcName: String, qe: QueryExecution, error: Throwable): Unit = {}
+      override def onFailure(funcName: String, qe: QueryExecution, error: Exception): Unit = {}
     }
 
     try {

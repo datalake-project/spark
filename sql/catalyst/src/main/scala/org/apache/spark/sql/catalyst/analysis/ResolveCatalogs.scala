@@ -106,6 +106,9 @@ class ResolveCatalogs(val catalogManager: CatalogManager)
       val columns = u.columns.map(UnresolvedAttribute(_))
       UpdateTable(aliased, columns, u.values, u.condition)
 
+    case AlterNamespaceSetPropertiesStatement(NonSessionCatalog(catalog, nameParts), properties) =>
+      AlterNamespaceSetProperties(catalog, nameParts, properties)
+
     case DescribeTableStatement(
          nameParts @ NonSessionCatalog(catalog, tableName), partitionSpec, isExtended) =>
       if (partitionSpec.nonEmpty) {

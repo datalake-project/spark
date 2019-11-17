@@ -253,21 +253,6 @@ class SparkSqlAstBuilder(conf: SQLConf) extends AstBuilder(conf) {
   }
 
   /**
-   * Create an [[AlterDatabasePropertiesCommand]] command.
-   *
-   * For example:
-   * {{{
-   *   ALTER (DATABASE|SCHEMA) database SET DBPROPERTIES (property_name=property_value, ...);
-   * }}}
-   */
-  override def visitSetDatabaseProperties(
-      ctx: SetDatabasePropertiesContext): LogicalPlan = withOrigin(ctx) {
-    AlterDatabasePropertiesCommand(
-      ctx.db.getText,
-      visitPropertyKeyValues(ctx.tablePropertyList))
-  }
-
-  /**
    * Create a plan for a DESCRIBE FUNCTION command.
    */
   override def visitDescribeFunction(ctx: DescribeFunctionContext): LogicalPlan = withOrigin(ctx) {

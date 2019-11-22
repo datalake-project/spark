@@ -50,8 +50,8 @@ class LocalDirsFeatureStepSuite extends SparkFunSuite with BeforeAndAfter {
   }
 
   test("Resolve to default local dir if neither env nor configuration are set") {
-    Mockito.doReturn(null).when(sparkConf).get("spark.local.dir")
-    Mockito.doReturn(null).when(sparkConf).getenv("SPARK_LOCAL_DIRS")
+    Mockito.doReturn(null, null).when(sparkConf).get("spark.local.dir")
+    Mockito.doReturn(null, null).when(sparkConf).getenv("SPARK_LOCAL_DIRS")
     val stepUnderTest = new LocalDirsFeatureStep(kubernetesConf, defaultLocalDir)
     val configuredPod = stepUnderTest.configurePod(SparkPod.initialPod())
     assert(configuredPod.pod.getSpec.getVolumes.size === 1)
@@ -76,7 +76,8 @@ class LocalDirsFeatureStepSuite extends SparkFunSuite with BeforeAndAfter {
   }
 
   test("Use configured local dirs split on comma if provided.") {
-    Mockito.doReturn("/var/data/my-local-dir-1,/var/data/my-local-dir-2")
+    Mockito.doReturn("/var/data/my-local-dir-1,/var/data/my-local-dir-2",
+      "/var/data/my-local-dir-1,/var/data/my-local-dir-2")
       .when(sparkConf).getenv("SPARK_LOCAL_DIRS")
     val stepUnderTest = new LocalDirsFeatureStep(kubernetesConf, defaultLocalDir)
     val configuredPod = stepUnderTest.configurePod(SparkPod.initialPod())

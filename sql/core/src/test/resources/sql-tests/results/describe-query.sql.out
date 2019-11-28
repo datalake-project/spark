@@ -86,7 +86,7 @@ struct<>
 -- !query 9 output
 org.apache.spark.sql.catalyst.parser.ParseException
 
-mismatched input 'AS' expecting {<EOF>, '.'}(line 1, pos 12)
+mismatched input 'AS' expecting <EOF>(line 1, pos 12)
 
 == SQL ==
 DESC WITH s AS (SELECT 'hello' as col1) SELECT * FROM s
@@ -100,7 +100,7 @@ struct<>
 -- !query 10 output
 org.apache.spark.sql.catalyst.parser.ParseException
 
-mismatched input 's' expecting {<EOF>, '.'}(line 1, pos 20)
+mismatched input 's' expecting <EOF>(line 1, pos 20)
 
 == SQL ==
 DESCRIBE QUERY WITH s AS (SELECT * from desc_temp1) SELECT * FROM s
@@ -114,7 +114,7 @@ struct<>
 -- !query 11 output
 org.apache.spark.sql.catalyst.parser.ParseException
 
-mismatched input 'desc_temp1' expecting {<EOF>, '.'}(line 1, pos 21)
+mismatched input 'desc_temp1' expecting <EOF>(line 1, pos 21)
 
 == SQL ==
 DESCRIBE INSERT INTO desc_temp1 values (1, 'val1')
@@ -128,7 +128,7 @@ struct<>
 -- !query 12 output
 org.apache.spark.sql.catalyst.parser.ParseException
 
-mismatched input 'desc_temp1' expecting {<EOF>, '.'}(line 1, pos 21)
+mismatched input 'desc_temp1' expecting <EOF>(line 1, pos 21)
 
 == SQL ==
 DESCRIBE INSERT INTO desc_temp1 SELECT * FROM desc_temp2

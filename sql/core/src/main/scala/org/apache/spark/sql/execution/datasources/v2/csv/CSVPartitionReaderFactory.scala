@@ -48,11 +48,12 @@ case class CSVPartitionReaderFactory(
 
   override def buildReader(file: PartitionedFile): PartitionReader[InternalRow] = {
     val conf = broadcastedConf.value.value
-    val parser = new UnivocityParser(
-      StructType(dataSchema.filterNot(_.name == parsedOptions.columnNameOfCorruptRecord)),
-      StructType(readDataSchema.filterNot(_.name == parsedOptions.columnNameOfCorruptRecord)),
-      parsedOptions)
-    val schema = if (columnPruning) readDataSchema else dataSchema
+    val actualDataSchema = StructType(
+      dataSchema.filterNot(_.name == parsedOptions.columnNameOfCorruptRecord))
+    val actualReadDataSchema = StructType(
+      readDataSchema.filterNot(_.name == parsedOptions.columnNameOfCorruptRecord))
+    val parser = new UnivocityParser(actualDataSchema, actualReadDataSchema, parsedOptions)
+    val schema = if (columnPruning) actualReadDataSchema else actualDataSchema
     val isStartOfFile = file.start == 0
     val headerChecker = new CSVHeaderChecker(
       schema, parsedOptions, source = s"CSV file: ${file.filePath}", isStartOfFile)

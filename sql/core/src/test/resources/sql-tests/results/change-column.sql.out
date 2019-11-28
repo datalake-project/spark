@@ -238,3 +238,4 @@ DROP VIEW global_temp.global_temp_view
 -- !query 24 schema
 struct<>
 -- !query 24 output
+

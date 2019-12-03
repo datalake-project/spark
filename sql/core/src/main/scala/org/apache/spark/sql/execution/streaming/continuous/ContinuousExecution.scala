@@ -275,7 +275,6 @@ class ContinuousExecution(
           SparkEnv.get.rpcEnv.stop(epochEndpoint)
           epochUpdateThread.interrupt()
           epochUpdateThread.join()
-          stopSources()
           // The following line must be the last line because it may fail if SparkContext is stopped
           sparkSession.sparkContext.cancelJobGroup(runId.toString)
         }
